@@ -1,0 +1,301 @@
+﻿@model GauGhar.Models.Cow
+@{
+    ViewData["Title"] = "Cow Details";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-cow me-2"></i>Cow Details
+        </h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil-square me-2"></i>Edit
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Cow Details Card -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-info-circle me-2"></i>Basic Information
+                    </h6>
+                    <div>
+                        @if (Model.IsPregnant)
+                        {
+                            <span class="badge bg-info">
+                                <i class="bi bi-heart-fill me-1"></i>Pregnant
+                            </span>
+                        }
+                        <span class="badge @GetStatusBadgeClass(Model.Status) ms-1">@Model.Status</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Tag Number:</dt>
+                                <dd class="col-sm-8"><strong>@Model.TagNumber</strong></dd>
+
+                                <dt class="col-sm-4">Name:</dt>
+                                <dd class="col-sm-8">@Model.Name</dd>
+
+                                <dt class="col-sm-4">Breed:</dt>
+                                <dd class="col-sm-8">@Model.Breed</dd>
+
+                                <dt class="col-sm-4">Age:</dt>
+                                <dd class="col-sm-8">@Model.Age years</dd>
+
+                                <dt class="col-sm-4">Date of Birth:</dt>
+                                <dd class="col-sm-8">@Model.DateOfBirth.ToString("dd-MMM-yyyy")</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Health Status:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge @GetHealthBadgeClass(Model.HealthStatus)">
+                                        @Model.HealthStatus
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-4">Color:</dt>
+                                <dd class="col-sm-8">@Model.Color</dd>
+
+                                @if (Model.PurchaseDate.HasValue)
+                                {
+                                    <dt class="col-sm-4">Purchase Date:</dt>
+                                    <dd class="col-sm-8">@Model.PurchaseDate.Value.ToString("dd-MMM-yyyy")</dd>
+
+                                    <dt class="col-sm-4">Purchase Price:</dt>
+                                    <dd class="col-sm-8">Rs. @Model.PurchasePrice?.ToString("N2")</dd>
+                                }
+
+                                @if (Model.IsPregnant && Model.PregnancyDate.HasValue)
+                                {
+                                    <dt class="col-sm-4">Pregnancy Date:</dt>
+                                    <dd class="col-sm-8">@Model.PregnancyDate.Value.ToString("dd-MMM-yyyy")</dd>
+
+                                    <dt class="col-sm-4">Expected Delivery:</dt>
+                                    <dd class="col-sm-8">@Model.ExpectedDeliveryDate?.ToString("dd-MMM-yyyy")</dd>
+                                }
+                            </dl>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Remarks))
+                    {
+                        <div class="mt-4">
+                            <h6 class="font-weight-bold text-primary">
+                                <i class="bi bi-chat-left-text me-2"></i>Remarks
+                            </h6>
+                            <p class="text-muted">@Model.Remarks</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Milk Records -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-droplet me-2"></i>Recent Milk Production
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.MilkRecords != null && Model.MilkRecords.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Morning (L)</th>
+                                        <th>Evening (L)</th>
+                                        <th>Total (L)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var record in Model.MilkRecords.OrderByDescending(m => m.Date).Take(10))
+                                    {
+                                        <tr>
+                                            <td>@record.Date.ToString("dd-MMM-yyyy")</td>
+                                            <td>@record.MorningQuantity.ToString("0.00")</td>
+                                            <td>@record.EveningQuantity.ToString("0.00")</td>
+                                            <td>@((record.MorningQuantity + record.EveningQuantity).ToString("0.00"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-3">No milk records found for this cow.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar - Health & Actions -->
+        <div class="col-lg-4">
+            <!-- Health Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-heart-pulse me-2"></i>Health Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-4 @GetHealthIconClass(Model.HealthStatus)">
+                            <i class="@GetHealthIcon(Model.HealthStatus)"></i>
+                        </div>
+                        <h5 class="mt-2">@Model.HealthStatus</h5>
+                    </div>
+
+                    @if (Model.Vaccinations != null && Model.Vaccinations.Any())
+                    {
+                        <h6 class="font-weight-bold text-primary">Recent Vaccinations</h6>
+                        <ul class="list-group list-group-flush">
+                            @foreach (var vac in Model.Vaccinations.OrderByDescending(v => v.VaccinationDate).Take(3))
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small>@vac.VaccineName</small><br>
+                                        <small class="text-muted">@vac.VaccinationDate.ToString("dd-MMM-yyyy")</small>
+                                    </div>
+                                    @if (vac.NextDueDate.HasValue)
+                                    {
+                                        <span class="badge @(vac.NextDueDate > DateTime.Now ? "bg-warning" : "bg-danger")">
+                                            Due: @vac.NextDueDate.Value.ToString("dd-MMM")
+                                        </span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No vaccination records</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-lightning me-2"></i>Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Milk" asp-action="Create" asp-route-cowId="@Model.Id"
+                           class="btn btn-success">
+                            <i class="bi bi-droplet me-2"></i>Add Milk Entry
+                        </a>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#vaccinationModal">
+                            <i class="bi bi-syringe me-2"></i>Record Vaccination
+                        </button>
+                        <button class="btn btn-info">
+                            <i class="bi bi-clipboard-data me-2"></i>View Full History
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-graph-up me-2"></i>Statistics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="h4 mb-3" id="avgMilk">@ViewBag.AvgMilkLastWeek?.ToString("0.00") L</div>
+                        <p class="text-muted">Average milk (Last 7 days)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vaccination Modal -->
+<div class="modal fade" id="vaccinationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Record Vaccination</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Vaccination feature will be implemented soon.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Active" => "bg-primary",
+            "Sold" => "bg-info",
+            "Dead" => "bg-dark",
+            _ => "bg-secondary"
+        };
+    }
+
+    string GetHealthBadgeClass(string healthStatus)
+    {
+        return healthStatus switch
+        {
+            "Healthy" => "bg-success",
+            "Sick" => "bg-danger",
+            "Under Treatment" => "bg-warning",
+            _ => "bg-secondary"
+        };
+    }
+
+    string GetHealthIcon(string healthStatus)
+    {
+        return healthStatus switch
+        {
+            "Healthy" => "bi bi-heart-fill",
+            "Sick" => "bi bi-heartbreak-fill",
+            "Under Treatment" => "bi bi-heart-half",
+            _ => "bi bi-heart"
+        };
+    }
+
+    string GetHealthIconClass(string healthStatus)
+    {
+        return healthStatus switch
+        {
+            "Healthy" => "text-success",
+            "Sick" => "text-danger",
+            "Under Treatment" => "text-warning",
+            _ => "text-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

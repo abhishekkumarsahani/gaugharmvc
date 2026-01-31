@@ -1,0 +1,258 @@
+﻿@model IEnumerable<GauGhar.Models.Cow>
+@{
+    ViewData["Title"] = "Cows Management";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-cow me-2"></i>Cows Management
+        </h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Add New Cow
+        </a>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-search me-2"></i>Search & Filter
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="searchString" class="form-control"
+                           placeholder="Search by tag or name" value="@ViewBag.SearchString" />
+                </div>
+                <div class="col-md-3">
+                    <select name="statusFilter" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="Active" selected="@(ViewBag.StatusFilter == "Active")">Active</option>
+                        <option value="Sold" selected="@(ViewBag.StatusFilter == "Sold")">Sold</option>
+                        <option value="Dead" selected="@(ViewBag.StatusFilter == "Dead")">Dead</option>
+                        <option value="Pregnant" selected="@(ViewBag.StatusFilter == "Pregnant")">Pregnant</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel me-2"></i>Filter
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a asp-action="Index" class="btn btn-secondary w-100">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cows Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-list-ul me-2"></i>Cows List
+                <span class="badge bg-secondary ms-2">@Model.Count() Cows</span>
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="cowsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tag No.</th>
+                            <th>Name</th>
+                            <th>Breed</th>
+                            <th>Age</th>
+                            <th>Health Status</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.TagNumber</strong>
+                                    @if (item.IsPregnant)
+                                    {
+                                        <span class="badge bg-info ms-1" title="Pregnant">
+                                            <i class="bi bi-heart-fill"></i>
+                                        </span>
+                                    }
+                                </td>
+                                <td>@item.Name</td>
+                                <td>@item.Breed</td>
+                                <td>@item.Age years</td>
+                                <td>
+                                    @switch (item.HealthStatus)
+                                    {
+                                        case "Healthy":
+                                            <span class="badge bg-success">@item.HealthStatus</span>
+                                            break;
+                                        case "Sick":
+                                            <span class="badge bg-danger">@item.HealthStatus</span>
+                                            break;
+                                        case "Under Treatment":
+                                            <span class="badge bg-warning">@item.HealthStatus</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@item.HealthStatus</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case "Active":
+                                            <span class="badge bg-primary">@item.Status</span>
+                                            break;
+                                        case "Sold":
+                                            <span class="badge bg-info">@item.Status</span>
+                                            break;
+                                        case "Dead":
+                                            <span class="badge bg-dark">@item.Status</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@item.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                    No cows found. <a asp-action="Create">Add your first cow</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Cows
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count()</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cow fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Cows
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.Count(c => c.Status == "Active")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pregnant Cows
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.Count(c => c.IsPregnant)
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-heart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Sick Cows
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.Count(c => c.HealthStatus == "Sick" || c.HealthStatus == "Under Treatment")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-heart-pulse fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#cowsTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                order: [[0, 'asc']],
+                language: {
+                    search: "Search cows:",
+                    lengthMenu: "Show _MENU_ cows per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ cows",
+                    infoEmpty: "No cows found",
+                    infoFiltered: "(filtered from _MAX_ total cows)"
+                }
+            });
+        });
+    </script>
+}

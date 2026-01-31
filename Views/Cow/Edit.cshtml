@@ -1,0 +1,145 @@
+﻿@model GauGhar.Models.Cow
+@{
+    ViewData["Title"] = "Edit Cow";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-lg">
+            <div class="card-header bg-warning text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-pencil-square me-2"></i>Edit Cow
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UserId" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TagNumber" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                    <input asp-for="TagNumber" class="form-control" />
+                                </div>
+                                <span asp-validation-for="TagNumber" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <input asp-for="Name" class="form-control" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Breed" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                    <select asp-for="Breed" class="form-control">
+                                        <option value="">Select Breed</option>
+                                        <option value="Holstein">Holstein</option>
+                                        <option value="Jersey">Jersey</option>
+                                        <option value="Brown Swiss">Brown Swiss</option>
+                                        <option value="Guernsey">Guernsey</option>
+                                        <option value="Ayrshire">Ayrshire</option>
+                                        <option value="Local">Local Breed</option>
+                                        <option value="Mixed">Mixed Breed</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Breed" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="DateOfBirth" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                                </div>
+                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                <small class="text-muted">Age: @Model.Age years</small>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="HealthStatus" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-heart-pulse"></i></span>
+                                    <select asp-for="HealthStatus" class="form-control">
+                                        <option value="Healthy">Healthy</option>
+                                        <option value="Sick">Sick</option>
+                                        <option value="Under Treatment">Under Treatment</option>
+                                        <option value="Recovering">Recovering</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="HealthStatus" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Status" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-info-circle"></i></span>
+                                    <select asp-for="Status" class="form-control">
+                                        <option value="Active">Active</option>
+                                        <option value="Sold">Sold</option>
+                                        <option value="Dead">Dead</option>
+                                        <option value="Retired">Retired</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsPregnant" class="form-check-input" />
+                                    <label asp-for="IsPregnant" class="form-check-label"></label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="PregnancyDate" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar-heart"></i></span>
+                                    <input asp-for="PregnancyDate" type="date" class="form-control" />
+                                </div>
+                                <span asp-validation-for="PregnancyDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save me-2"></i>Update Cow
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

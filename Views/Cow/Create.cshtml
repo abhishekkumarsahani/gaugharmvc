@@ -1,0 +1,221 @@
+﻿@model GauGhar.Models.Cow
+@{
+    ViewData["Title"] = "Add New Cow";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Cow
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TagNumber" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                    <input asp-for="TagNumber" class="form-control" placeholder="Enter tag number" />
+                                </div>
+                                <span asp-validation-for="TagNumber" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <input asp-for="Name" class="form-control" placeholder="Enter cow name" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Breed" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                    <select asp-for="Breed" class="form-control">
+                                        <option value="">Select Breed</option>
+                                        <option value="Holstein">Holstein</option>
+                                        <option value="Jersey">Jersey</option>
+                                        <option value="Brown Swiss">Brown Swiss</option>
+                                        <option value="Guernsey">Guernsey</option>
+                                        <option value="Ayrshire">Ayrshire</option>
+                                        <option value="Local">Local Breed</option>
+                                        <option value="Mixed">Mixed Breed</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Breed" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="DateOfBirth" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                                </div>
+                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                <small class="text-muted">Age: <span id="ageDisplay">0 years</span></small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Color" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-palette"></i></span>
+                                    <select asp-for="Color" class="form-control">
+                                        <option value="">Select Color</option>
+                                        <option value="Black">Black</option>
+                                        <option value="White">White</option>
+                                        <option value="Brown">Brown</option>
+                                        <option value="Red">Red</option>
+                                        <option value="Spotted">Spotted</option>
+                                        <option value="Mixed">Mixed</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Color" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="PurchaseDate" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-cart"></i></span>
+                                    <input asp-for="PurchaseDate" type="date" class="form-control" />
+                                </div>
+                                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="PurchasePrice" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                                    <input asp-for="PurchasePrice" class="form-control" placeholder="Enter purchase price" />
+                                </div>
+                                <span asp-validation-for="PurchasePrice" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="HealthStatus" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-heart-pulse"></i></span>
+                                    <select asp-for="HealthStatus" class="form-control">
+                                        <option value="Healthy">Healthy</option>
+                                        <option value="Sick">Sick</option>
+                                        <option value="Under Treatment">Under Treatment</option>
+                                        <option value="Recovering">Recovering</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="HealthStatus" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Status" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-info-circle"></i></span>
+                                    <select asp-for="Status" class="form-control">
+                                        <option value="Active">Active</option>
+                                        <option value="Sold">Sold</option>
+                                        <option value="Dead">Dead</option>
+                                        <option value="Retired">Retired</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsPregnant" class="form-check-input" />
+                                    <label asp-for="IsPregnant" class="form-check-label"></label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="pregnancyFields" style="display: none;">
+                                <label asp-for="PregnancyDate" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar-heart"></i></span>
+                                    <input asp-for="PregnancyDate" type="date" class="form-control" />
+                                </div>
+                                <small class="text-muted" id="expectedDelivery"></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Any additional remarks"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Add Cow
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Calculate age from date of birth
+        $('#DateOfBirth').change(function() {
+            var dob = new Date($(this).val());
+            if (!isNaN(dob.getTime())) {
+                var today = new Date();
+                var age = today.getFullYear() - dob.getFullYear();
+                var m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                $('#ageDisplay').text(age + ' years');
+            }
+        });
+
+        // Show/hide pregnancy fields
+        $('#IsPregnant').change(function() {
+            if ($(this).is(':checked')) {
+                $('#pregnancyFields').show();
+            } else {
+                $('#pregnancyFields').hide();
+            }
+        });
+
+        // Calculate expected delivery date
+        $('#PregnancyDate').change(function() {
+            var pregDate = new Date($(this).val());
+            if (!isNaN(pregDate.getTime())) {
+                var expectedDate = new Date(pregDate);
+                expectedDate.setMonth(pregDate.getMonth() + 9);
+                expectedDate.setDate(pregDate.getDate() + 7);
+                
+                var options = { year: 'numeric', month: 'long', day: 'numeric' };
+                $('#expectedDelivery').text('Expected delivery: ' + expectedDate.toLocaleDateString(undefined, options));
+            }
+        });
+
+        // Initialize
+        $(document).ready(function() {
+            $('#IsPregnant').trigger('change');
+            $('#DateOfBirth').trigger('change');
+            $('#PregnancyDate').trigger('change');
+        });
+    </script>
+}
