@@ -52,10 +52,10 @@ namespace GauGhar.Controllers
                 .OrderBy(c => c.TagNumber)
                 .ToListAsync();
 
-            // Calculate totals
+            // Calculate totals - manually sum morning and evening
             ViewBag.TotalMorning = milkRecords.Sum(m => m.MorningQuantity);
             ViewBag.TotalEvening = milkRecords.Sum(m => m.EveningQuantity);
-            ViewBag.GrandTotal = milkRecords.Sum(m => m.TotalQuantity);
+            ViewBag.GrandTotal = milkRecords.Sum(m => m.MorningQuantity + m.EveningQuantity);
 
             return View(milkRecords);
         }
@@ -122,7 +122,7 @@ namespace GauGhar.Controllers
                     Cow = g.Key,
                     MorningQuantity = g.Sum(m => m.MorningQuantity),
                     EveningQuantity = g.Sum(m => m.EveningQuantity),
-                    TotalQuantity = g.Sum(m => m.TotalQuantity)
+                    TotalQuantity = g.Sum(m => m.MorningQuantity + m.EveningQuantity)
                 })
                 .OrderBy(s => s.Cow.TagNumber)
                 .ToListAsync();
@@ -150,10 +150,10 @@ namespace GauGhar.Controllers
                            m.Date >= startDate &&
                            m.Date <= endDate)
                 .GroupBy(m => m.Date)
-                .Select(g => new
+                .Select(g => new MonthlyData
                 {
                     Date = g.Key,
-                    TotalMilk = g.Sum(m => m.TotalQuantity),
+                    TotalMilk = g.Sum(m => m.MorningQuantity + m.EveningQuantity),
                     RecordCount = g.Count()
                 })
                 .OrderBy(x => x.Date)
@@ -168,13 +168,20 @@ namespace GauGhar.Controllers
             return View(monthlyData);
         }
 
-        // Helper class for daily summary
+        // Helper classes
         public class DailyMilkSummary
         {
             public Cow? Cow { get; set; }
             public decimal MorningQuantity { get; set; }
             public decimal EveningQuantity { get; set; }
             public decimal TotalQuantity { get; set; }
+        }
+
+        public class MonthlyData
+        {
+            public DateTime Date { get; set; }
+            public decimal TotalMilk { get; set; }
+            public int RecordCount { get; set; }
         }
     }
 }

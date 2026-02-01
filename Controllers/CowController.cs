@@ -69,7 +69,7 @@ namespace GauGhar.Controllers
             // Calculate average milk production for last 7 days
             var lastWeekMilk = cow.MilkRecords?
                 .Where(m => m.Date >= DateTime.Today.AddDays(-7))
-                .Select(m => m.TotalQuantity)
+                .Select(m => m.MorningQuantity + m.EveningQuantity) // Calculate manually
                 .DefaultIfEmpty(0)
                 .Average();
 
@@ -84,26 +84,64 @@ namespace GauGhar.Controllers
             return View();
         }
 
-        // POST: Cow/Create
+        // POST: Cow/Create - SIMPLIFIED VERSION
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TagNumber,Name,Breed,DateOfBirth,PurchaseDate,PurchasePrice,Color,HealthStatus,Status,IsPregnant,PregnancyDate,Remarks")] Cow cow)
         {
+            // Check authentication
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["ErrorMessage"] = "Please login first.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                ModelState.AddModelError("", "User ID not found. Please login again.");
+                return View(cow);
+            }
+
             if (ModelState.IsValid)
             {
-                cow.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // Calculate expected delivery date if pregnant
-                if (cow.IsPregnant && cow.PregnancyDate.HasValue)
+                try
                 {
-                    cow.ExpectedDeliveryDate = cow.PregnancyDate.Value.AddMonths(9).AddDays(7);
-                }
+                    cow.UserId = userId;
 
-                _context.Add(cow);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Cow added successfully!";
-                return RedirectToAction(nameof(Index));
+                    // REMOVED: cow.CreatedAt = DateTime.Now; // This causes the error
+
+                    // Calculate expected delivery date if pregnant
+                    if (cow.IsPregnant && cow.PregnancyDate.HasValue)
+                    {
+                        cow.ExpectedDeliveryDate = cow.PregnancyDate.Value.AddMonths(9).AddDays(7);
+                    }
+
+                    _context.Add(cow);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"Cow '{cow.Name}' added successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Handle duplicate tag number
+                    if (ex.InnerException?.Message.Contains("TagNumber") == true)
+                    {
+                        ModelState.AddModelError("TagNumber", "Tag number already exists. Please use a different tag number.");
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Error saving cow to database. Please try again.";
+                    }
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "An unexpected error occurred. Please try again.";
+                }
             }
+
             return View(cow);
         }
 
@@ -158,6 +196,7 @@ namespace GauGhar.Controllers
                     _context.Update(cow);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Cow updated successfully!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -170,7 +209,10 @@ namespace GauGhar.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "Error updating cow. Please try again.";
+                }
             }
             return View(cow);
         }
@@ -205,9 +247,16 @@ namespace GauGhar.Controllers
 
             if (cow != null)
             {
-                _context.Cows.Remove(cow);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Cow deleted successfully!";
+                try
+                {
+                    _context.Cows.Remove(cow);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cow deleted successfully!";
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "Error deleting cow. Please try again.";
+                }
             }
 
             return RedirectToAction(nameof(Index));

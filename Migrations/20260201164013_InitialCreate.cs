@@ -194,7 +194,8 @@ namespace GauGhar.Migrations
                     PregnancyDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ExpectedDeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

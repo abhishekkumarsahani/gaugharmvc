@@ -1,0 +1,245 @@
+﻿@model IEnumerable<object>
+@{
+    ViewData["Title"] = "Monthly Milk Report";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-calendar-month me-2"></i>Monthly Milk Report
+        </h1>
+        <div class="d-flex">
+            <div class="input-group me-2" style="width: 200px;">
+                <select class="form-control" id="monthSelect">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        <option value="@i" selected="@(ViewBag.Month == i)">@(new DateTime(2024, i, 1).ToString("MMMM"))</option>
+                    }
+                </select>
+                <select class="form-control" id="yearSelect" style="width: 100px;">
+                    @for (int i = 2022; i <= 2024; i++)
+                    {
+                        <option value="@i" selected="@(ViewBag.Year == i)">@i</option>
+                    }
+                </select>
+                <button class="btn btn-outline-primary" type="button" id="goToReport">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Records
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-6 col-lg-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Monthly Total
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalMilk?.ToString("0.00") L
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-xs">Month: @ViewBag.MonthName @ViewBag.Year</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-droplet fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Daily Average
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.AverageDaily?.ToString("0.00") L
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-xs">Total Days: @Model.Count()</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-graph-up fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Report Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-table me-2"></i>Daily Milk Production - @ViewBag.MonthName @ViewBag.Year
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="monthlyReportTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Total Milk (L)</th>
+                            <th>Records</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (dynamic day in Model)
+                        {
+                            <tr>
+                                <td>@day.Date.ToString("dd-MMM-yyyy")</td>
+                                <td>@day.Date.ToString("dddd")</td>
+                                <td class="text-end fw-bold">@(((decimal)day.TotalMilk).ToString("0.00"))</td>
+                                <td class="text-center">@day.RecordCount</td>
+                                <td>
+                                    @{
+                                        var avgMilk = (decimal)day.TotalMilk;
+                                        var status = avgMilk >= ViewBag.AverageDaily ? "bg-success" : "bg-warning";
+                                        var icon = avgMilk >= ViewBag.AverageDaily ? "bi-arrow-up" : "bi-arrow-down";
+                                    }
+                                    <span class="badge @status">
+                                        <i class="bi @icon me-1"></i>
+                                        @if (avgMilk >= ViewBag.AverageDaily)
+                                        {
+                                            <text>Above Average</text>
+                                        }
+                                        else
+                                        {
+                                            <text>Below Average</text>
+                                        }
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="bi bi-calendar-x display-4 d-block mb-2"></i>
+                                    No milk records found for this month.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    @if (Model.Any())
+                    {
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="2" class="text-end">Monthly Total:</th>
+                                <th class="text-end">@ViewBag.TotalMilk?.ToString("0.00") L</th>
+                                <th class="text-center">@Model.Sum(d => ((dynamic)d).RecordCount)</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Chart -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-graph-up me-2"></i>Monthly Production Trend
+            </h6>
+            <div>
+                <button class="btn btn-sm btn-outline-primary" id="toggleChart">
+                    <i class="bi bi-arrows-angle-expand me-2"></i>Toggle View
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart-area">
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#monthlyReportTable').DataTable({
+                pageLength: 31,
+                responsive: true,
+                order: [[0, 'asc']],
+                language: {
+                    search: "Search days:",
+                    lengthMenu: "Show _MENU_ days per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ days",
+                    infoEmpty: "No days found",
+                    infoFiltered: "(filtered from _MAX_ total days)"
+                }
+            });
+
+            // Month/Year navigation
+            $('#goToReport').click(function () {
+                var month = $('#monthSelect').val();
+                var year = $('#yearSelect').val();
+                window.location.href = '@Url.Action("MonthlyReport", "Milk")?year=' + year + '&month=' + month;
+            });
+
+            // Create chart
+            createMonthlyChart();
+        });
+
+        function createMonthlyChart() {
+            var ctx = document.getElementById('monthlyChart').getContext('2d');
+            var dates = @Html.Raw(Json.Serialize(Model.Select(d => ((dynamic)d).Date.ToString("dd")).ToList()));
+            var milkData = @Html.Raw(Json.Serialize(Model.Select(d => ((decimal)((dynamic)d).TotalMilk)).ToList()));
+
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Daily Milk Production (L)',
+                        data: milkData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Liters'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Day of Month'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

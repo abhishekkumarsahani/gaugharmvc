@@ -1,0 +1,164 @@
+﻿@model GauGhar.Models.MilkRecord
+@{
+    ViewData["Title"] = "Add Milk Entry";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-plus-circle me-2"></i>Add Milk Entry
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CowId" class="form-label"></label>
+                                <select asp-for="CowId" class="form-control" required>
+                                    <option value="">Select Cow</option>
+                                    @foreach (var cow in ViewBag.Cows)
+                                    {
+                                        <option value="@cow.Id">@cow.TagNumber - @cow.Name (@cow.Breed)</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CowId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Date" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input asp-for="Date" type="date" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-sun me-2"></i>Morning Session
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label asp-for="MorningQuantity" class="form-label"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-droplet"></i></span>
+                                            <input asp-for="MorningQuantity" class="form-control"
+                                                   placeholder="Enter morning milk quantity"
+                                                   step="0.01" min="0" max="50" required />
+                                            <span class="input-group-text">L</span>
+                                        </div>
+                                        <span asp-validation-for="MorningQuantity" class="text-danger"></span>
+                                        <small class="text-muted">Enter quantity in liters (0-50)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-moon me-2"></i>Evening Session
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label asp-for="EveningQuantity" class="form-label"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-droplet-fill"></i></span>
+                                            <input asp-for="EveningQuantity" class="form-control"
+                                                   placeholder="Enter evening milk quantity"
+                                                   step="0.01" min="0" max="50" required />
+                                            <span class="input-group-text">L</span>
+                                        </div>
+                                        <span asp-validation-for="EveningQuantity" class="text-danger"></span>
+                                        <small class="text-muted">Enter quantity in liters (0-50)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="3"
+                                          placeholder="Any remarks about today's milking"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Display -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <h6>Morning</h6>
+                                <h4 id="morningDisplay">0.00 L</h4>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Evening</h6>
+                                <h4 id="eveningDisplay">0.00 L</h4>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Total</h6>
+                                <h4 id="totalDisplay" class="text-success">0.00 L</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Save Milk Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Calculate and display totals
+        function updateTotals() {
+            var morning = parseFloat($('#MorningQuantity').val()) || 0;
+            var evening = parseFloat($('#EveningQuantity').val()) || 0;
+            var total = morning + evening;
+
+            $('#morningDisplay').text(morning.toFixed(2) + ' L');
+            $('#eveningDisplay').text(evening.toFixed(2) + ' L');
+            $('#totalDisplay').text(total.toFixed(2) + ' L');
+        }
+
+        // Update totals when quantities change
+        $('#MorningQuantity, #EveningQuantity').on('input', updateTotals);
+
+        // Initialize totals on page load
+        $(document).ready(function () {
+            updateTotals();
+
+            // Set default date to today
+            var today = new Date().toISOString().split('T')[0];
+            $('#Date').val(today);
+        });
+    </script>
+}

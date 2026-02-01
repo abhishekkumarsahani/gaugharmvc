@@ -1,0 +1,277 @@
+﻿@model IEnumerable<GauGhar.Controllers.MilkController.DailyMilkSummary>
+@{
+    ViewData["Title"] = "Daily Milk Summary";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-calendar-day me-2"></i>Daily Milk Summary
+        </h1>
+        <div class="d-flex">
+            <div class="input-group me-2" style="width: 200px;">
+                <input type="date" class="form-control" id="datePicker" value="@ViewBag.SelectedDate?.ToString("yyyy-MM-dd")" />
+                <button class="btn btn-outline-primary" type="button" id="goToDate">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Records
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Morning Total
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalMorning?.ToString("0.00") L
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-xs">Date: @ViewBag.SelectedDate?.ToString("dd-MMM-yyyy")</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-sun fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                Evening Total
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalEvening?.ToString("0.00") L
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-xs">Total Cows: @Model.Count()</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-moon fa-2x text-secondary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Daily Total
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.GrandTotal?.ToString("0.00") L
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-xs">Average per Cow: @((Model.Any() ? Model.Average(s => s.TotalQuantity) : 0).ToString("0.00")) L</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-droplet fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Summary Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-list-ul me-2"></i>Daily Milk Production by Cow
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dailySummaryTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cow</th>
+                            <th>Tag No.</th>
+                            <th>Breed</th>
+                            <th>Morning (L)</th>
+                            <th>Evening (L)</th>
+                            <th>Total (L)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var summary in Model)
+                        {
+                            <tr>
+                                <td>@summary.Cow?.Name</td>
+                                <td>@summary.Cow?.TagNumber</td>
+                                <td>@summary.Cow?.Breed</td>
+                                <td class="text-end">@summary.MorningQuantity.ToString("0.00")</td>
+                                <td class="text-end">@summary.EveningQuantity.ToString("0.00")</td>
+                                <td class="text-end fw-bold text-primary">@summary.TotalQuantity.ToString("0.00")</td>
+                                <td>
+                                    @if (summary.Cow?.HealthStatus == "Healthy")
+                                    {
+                                        <span class="badge bg-success">Healthy</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">@summary.Cow?.HealthStatus</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-calendar-x display-4 d-block mb-2"></i>
+                                    No milk records found for this date.
+                                    <a asp-action="Create">Add milk records for today</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-bar-chart me-2"></i>Production Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="productionChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-pie-chart me-2"></i>Top Producers
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var summary in Model.OrderByDescending(s => s.TotalQuantity).Take(5))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="fw-bold">@summary.Cow?.Name</small><br>
+                                    <small class="text-muted">@summary.Cow?.TagNumber</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">@summary.TotalQuantity.ToString("0.0") L</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#dailySummaryTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                order: [[5, 'desc']], // Sort by Total descending
+                language: {
+                    search: "Search cows:",
+                    lengthMenu: "Show _MENU_ records per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered from _MAX_ total records)"
+                }
+            });
+
+            // Date picker navigation
+            $('#goToDate').click(function () {
+                var selectedDate = $('#datePicker').val();
+                if (selectedDate) {
+                    window.location.href = '@Url.Action("DailySummary", "Milk")?date=' + selectedDate;
+                }
+            });
+
+            // Create chart
+            createProductionChart();
+        });
+
+        function createProductionChart() {
+            var ctx = document.getElementById('productionChart').getContext('2d');
+            var cowNames = @Html.Raw(Json.Serialize(Model.Select(s => s.Cow?.Name).Take(10)));
+            var totals = @Html.Raw(Json.Serialize(Model.Select(s => s.TotalQuantity).Take(10)));
+
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: cowNames,
+                    datasets: [{
+                        label: 'Milk Production (L)',
+                        data: totals,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Liters'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Cows'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

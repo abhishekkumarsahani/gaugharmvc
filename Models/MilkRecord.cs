@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace GauGhar.Models
 {
@@ -16,33 +17,26 @@ namespace GauGhar.Models
         public DateTime Date { get; set; } = DateTime.Today;
 
         [Required]
-        [Display(Name = "Morning Quantity (L)")]
         [Column(TypeName = "decimal(5,2)")]
-        [Range(0, 50, ErrorMessage = "Quantity must be between 0 and 50")]
+        [Range(0, 50)]
         public decimal MorningQuantity { get; set; }
 
         [Required]
-        [Display(Name = "Evening Quantity (L)")]
         [Column(TypeName = "decimal(5,2)")]
-        [Range(0, 50, ErrorMessage = "Quantity must be between 0 and 50")]
+        [Range(0, 50)]
         public decimal EveningQuantity { get; set; }
 
-        // Remove [NotMapped] and make it a regular property
-        [Display(Name = "Total Quantity")]
         [Column(TypeName = "decimal(5,2)")]
-        public decimal TotalQuantity { get; set; } // Remove the computed getter
+        public decimal TotalQuantity { get; set; }
 
         [StringLength(500)]
         public string? Remarks { get; set; }
 
         [Required]
+        [ValidateNever]
         public string UserId { get; set; } = string.Empty;
 
-        // Navigation properties
-        [ForeignKey("CowId")]
-        public virtual Cow? Cow { get; set; }
-
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser? User { get; set; }
+        public Cow? Cow { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }

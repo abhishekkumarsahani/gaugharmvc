@@ -1,0 +1,268 @@
+﻿@model IEnumerable<GauGhar.Models.MilkRecord>
+@{
+    ViewData["Title"] = "Milk Records";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-droplet me-2"></i>Milk Records
+        </h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Add Milk Entry
+        </a>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-funnel me-2"></i>Filter Records
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Select Cow</label>
+                    <select name="cowId" class="form-control">
+                        <option value="">All Cows</option>
+                        @foreach (var cow in ViewBag.Cows)
+                        {
+                            <option value="@cow.Id" selected="@(ViewBag.CowId == cow.Id)">@cow.TagNumber - @cow.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="d-grid w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Morning Milk
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalMorning?.ToString("0.00") L
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-sun fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Evening Milk
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalEvening?.ToString("0.00") L
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-moon fa-2x text-secondary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Grand Total
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.GrandTotal?.ToString("0.00") L
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-droplet fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milk Records Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-list-ul me-2"></i>Milk Production Records
+            </h6>
+            <div>
+                <a asp-action="DailySummary" class="btn btn-sm btn-info me-2">
+                    <i class="bi bi-calendar-day me-2"></i>Daily Summary
+                </a>
+                <a asp-action="MonthlyReport" class="btn btn-sm btn-success">
+                    <i class="bi bi-calendar-month me-2"></i>Monthly Report
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="milkRecordsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Cow</th>
+                            <th>Tag No.</th>
+                            <th>Morning (L)</th>
+                            <th>Evening (L)</th>
+                            <th>Total (L)</th>
+                            <th>Recorded By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in Model)
+                        {
+                            <tr>
+                                <td>@record.Date.ToString("dd-MMM-yyyy")</td>
+                                <td>@record.Cow?.Name</td>
+                                <td>@record.Cow?.TagNumber</td>
+                                <td class="text-end">@record.MorningQuantity.ToString("0.00")</td>
+                                <td class="text-end">@record.EveningQuantity.ToString("0.00")</td>
+                                <td class="text-end fw-bold">
+                                    @((record.MorningQuantity + record.EveningQuantity).ToString("0.00"))
+                                </td>
+                                <td>@record.User?.FullName</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="#" class="btn btn-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="bi bi-droplet display-4 d-block mb-2"></i>
+                                    No milk records found. <a asp-action="Create">Add your first milk record</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Summary Chart -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-graph-up me-2"></i>Daily Milk Production Trend
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="chart-area">
+                <canvas id="dailyMilkChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#milkRecordsTable').DataTable({
+                pageLength: 25,
+                responsive: true,
+                order: [[0, 'desc']],
+                language: {
+                    search: "Search records:",
+                    lengthMenu: "Show _MENU_ records per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered from _MAX_ total records)"
+                },
+                columnDefs: [
+                    { orderable: false, targets: [7] } // Disable sorting on Actions column
+                ]
+            });
+
+            // Create simple chart for demo
+            createMilkChart();
+        });
+
+        function createMilkChart() {
+            var ctx = document.getElementById('dailyMilkChart').getContext('2d');
+            var dates = @Html.Raw(Json.Serialize(Model.Select(m => m.Date.ToString("dd-MMM")).Take(14).Reverse()));
+            var totals = @Html.Raw(Json.Serialize(Model.Select(m => m.MorningQuantity + m.EveningQuantity).Take(14).Reverse()));
+
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Daily Milk Production (L)',
+                        data: totals,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Liters'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

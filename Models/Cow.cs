@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GauGhar.Models
 {
@@ -39,11 +39,11 @@ namespace GauGhar.Models
         [Required]
         [StringLength(20)]
         [Display(Name = "Health Status")]
-        public string HealthStatus { get; set; } = "Healthy"; // Healthy, Sick, Under Treatment
+        public string HealthStatus { get; set; } = "Healthy";
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active"; // Active, Sold, Dead, Pregnant
+        public string Status { get; set; } = "Active";
 
         [Display(Name = "Is Pregnant")]
         public bool IsPregnant { get; set; }
@@ -81,4 +81,4 @@ namespace GauGhar.Models
             }
         }
     }
-    }
+}
