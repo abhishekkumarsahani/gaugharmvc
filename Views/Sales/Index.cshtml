@@ -1,0 +1,243 @@
+﻿@model IEnumerable<GauGhar.Models.MilkSale>
+@{
+    ViewData["Title"] = "Milk Sales";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-cart-check me-2"></i>Milk Sales
+        </h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Record Sale
+        </a>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-funnel me-2"></i>Filter Sales
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Buyer Type</label>
+                    <select name="buyerType" class="form-control">
+                        <option value="">All Types</option>
+                        <option value="Dairy" selected="@(ViewBag.BuyerType == "Dairy")">Dairy</option>
+                        <option value="Hotel" selected="@(ViewBag.BuyerType == "Hotel")">Hotel</option>
+                        <option value="Local" selected="@(ViewBag.BuyerType == "Local")">Local</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="d-grid w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Quantity Sold
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalQuantity?.ToString("0.00") L
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-droplet fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Sales Amount
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                Rs. @ViewBag.TotalAmount?.ToString("N2")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cash-stack fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Average Rate
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                Rs. @ViewBag.AverageRate?.ToString("0.00")/L
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-graph-up fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Records
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.Count()
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-list-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-table me-2"></i>Sales Records
+            </h6>
+            <div>
+                <a asp-action="Summary" class="btn btn-sm btn-info">
+                    <i class="bi bi-bar-chart me-2"></i>View Summary
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="salesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Buyer</th>
+                            <th>Type</th>
+                            <th>Quantity (L)</th>
+                            <th>Rate (Rs./L)</th>
+                            <th>Total Amount</th>
+                            <th>Remarks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sale in Model)
+                        {
+                            <tr>
+                                <td>@sale.SaleDate.ToString("dd-MMM-yyyy")</td>
+                                <td>@sale.BuyerName</td>
+                                <td>
+                                    <span class="badge @GetBuyerTypeBadge(sale.BuyerType)">
+                                        @sale.BuyerType
+                                    </span>
+                                </td>
+                                <td class="text-end">@sale.Quantity.ToString("0.00")</td>
+                                <td class="text-end">@sale.RatePerLiter.ToString("0.00")</td>
+                                <td class="text-end fw-bold text-success">
+                                    Rs. @((sale.Quantity * sale.RatePerLiter).ToString("N2"))
+                                </td>
+                                <td>@sale.Remarks</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Edit" asp-route-id="@sale.Id" class="btn btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@sale.Id" class="btn btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="bi bi-cart-x display-4 d-block mb-2"></i>
+                                    No sales records found. <a asp-action="Create">Record your first sale</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetBuyerTypeBadge(string buyerType)
+    {
+        return buyerType switch
+        {
+            "Dairy" => "bg-primary",
+            "Hotel" => "bg-success",
+            "Local" => "bg-info",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#salesTable').DataTable({
+                pageLength: 25,
+                responsive: true,
+                order: [[0, 'desc']],
+                language: {
+                    search: "Search sales:",
+                    lengthMenu: "Show _MENU_ records per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered from _MAX_ total records)"
+                },
+                columnDefs: [
+                    { orderable: false, targets: [7] } // Disable sorting on Actions column
+                ]
+            });
+        });
+    </script>
+}

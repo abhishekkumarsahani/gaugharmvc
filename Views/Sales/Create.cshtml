@@ -1,0 +1,159 @@
+﻿@model GauGhar.Models.MilkSale
+@{
+    ViewData["Title"] = "Record Sale";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-cart-plus me-2"></i>Record Milk Sale
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="BuyerName" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input asp-for="BuyerName" class="form-control" placeholder="Enter buyer name" required />
+                                </div>
+                                <span asp-validation-for="BuyerName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="BuyerType" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                    <select asp-for="BuyerType" class="form-control" required>
+                                        <option value="">Select Buyer Type</option>
+                                        <option value="Dairy">Dairy Company</option>
+                                        <option value="Hotel">Hotel/Restaurant</option>
+                                        <option value="Local">Local Customer</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="BuyerType" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="SaleDate" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input asp-for="SaleDate" type="date" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="SaleDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-droplet"></i></span>
+                                    <input asp-for="Quantity" class="form-control"
+                                           placeholder="Enter quantity"
+                                           step="0.01" min="0.1" max="1000" required />
+                                    <span class="input-group-text">L</span>
+                                </div>
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                                <small class="text-muted">Enter quantity in liters (0.1-1000)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="RatePerLiter" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                                    <input asp-for="RatePerLiter" class="form-control"
+                                           placeholder="Enter rate per liter"
+                                           step="0.01" min="1" max="200" required />
+                                    <span class="input-group-text">/L</span>
+                                </div>
+                                <span asp-validation-for="RatePerLiter" class="text-danger"></span>
+                                <small class="text-muted">Enter rate in Rs. per liter (1-200)</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="2"
+                                          placeholder="Any remarks about this sale"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculation Display -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <h6>Quantity</h6>
+                                <h4 id="quantityDisplay">0.00 L</h4>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Rate</h6>
+                                <h4 id="rateDisplay">Rs. 0.00/L</h4>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Total Amount</h6>
+                                <h4 id="totalDisplay" class="text-success">Rs. 0.00</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Record Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Calculate and display totals
+        function updateTotals() {
+            var quantity = parseFloat($('#Quantity').val()) || 0;
+            var rate = parseFloat($('#RatePerLiter').val()) || 0;
+            var total = quantity * rate;
+
+            $('#quantityDisplay').text(quantity.toFixed(2) + ' L');
+            $('#rateDisplay').text('Rs. ' + rate.toFixed(2) + '/L');
+            $('#totalDisplay').text('Rs. ' + total.toFixed(2));
+        }
+
+        // Update totals when quantities change
+        $('#Quantity, #RatePerLiter').on('input', updateTotals);
+
+        // Initialize totals on page load
+        $(document).ready(function () {
+            updateTotals();
+
+            // Set default date to today
+            var today = new Date().toISOString().split('T')[0];
+            $('#SaleDate').val(today);
+        });
+    </script>
+}

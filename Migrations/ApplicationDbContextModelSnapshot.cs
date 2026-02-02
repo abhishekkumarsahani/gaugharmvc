@@ -114,9 +114,6 @@ namespace GauGhar.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 

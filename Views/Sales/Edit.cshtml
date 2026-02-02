@@ -1,0 +1,133 @@
+﻿@model GauGhar.Models.MilkSale
+@{
+    ViewData["Title"] = "Edit Sale";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-warning text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-pencil-square me-2"></i>Edit Sale Record
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UserId" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="BuyerName" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input asp-for="BuyerName" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="BuyerName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="BuyerType" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                    <select asp-for="BuyerType" class="form-control" required>
+                                        <option value="">Select Buyer Type</option>
+                                        <option value="Dairy">Dairy Company</option>
+                                        <option value="Hotel">Hotel/Restaurant</option>
+                                        <option value="Local">Local Customer</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="BuyerType" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="SaleDate" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input asp-for="SaleDate" type="date" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="SaleDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-droplet"></i></span>
+                                    <input asp-for="Quantity" class="form-control"
+                                           step="0.01" min="0.1" max="1000" required />
+                                    <span class="input-group-text">L</span>
+                                </div>
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="RatePerLiter" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                                    <input asp-for="RatePerLiter" class="form-control"
+                                           step="0.01" min="1" max="200" required />
+                                    <span class="input-group-text">/L</span>
+                                </div>
+                                <span asp-validation-for="RatePerLiter" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculation Display -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <h6>Quantity</h6>
+                                <h4>@Model.Quantity.ToString("0.00") L</h4>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Rate</h6>
+                                <h4>Rs. @Model.RatePerLiter.ToString("0.00")/L</h4>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Total Amount</h6>
+                                <h4 class="text-success">Rs. @((Model.Quantity * Model.RatePerLiter).ToString("N2"))</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save me-2"></i>Update Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

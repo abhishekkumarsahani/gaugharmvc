@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GauGhar.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260201164013_InitialCreate")]
+    [Migration("20260202145417_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -116,9 +116,6 @@ namespace GauGhar.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
