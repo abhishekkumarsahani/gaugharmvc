@@ -1,0 +1,226 @@
+﻿@model IEnumerable<GauGhar.Models.Expense>
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-cash-stack me-2"></i>Expenses
+        </h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Add Expense
+        </a>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-funnel me-2"></i>Filter Expenses
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Category</label>
+                    <select name="categoryId" class="form-control">
+                        <option value="">All Categories</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id" selected="@(ViewBag.CategoryId == category.Id)">
+                                @category.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="d-grid w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Expenses
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                Rs. @ViewBag.TotalAmount?.ToString("N2")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cash-coin fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Records
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.Count()
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-list-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Average Expense
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                Rs. @ViewBag.AverageExpense?.ToString("N2")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-graph-up fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expenses Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="bi bi-table me-2"></i>Expense Records
+            </h6>
+            <div>
+                <a asp-action="Summary" class="btn btn-sm btn-info">
+                    <i class="bi bi-pie-chart me-2"></i>View Summary
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="expensesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Remarks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in Model)
+                        {
+                            <tr>
+                                <td>@expense.ExpenseDate.ToString("dd-MMM-yyyy")</td>
+                                <td>
+                                    <span class="badge @GetCategoryBadge(expense.ExpenseCategory?.Name)">
+                                        @expense.ExpenseCategory?.Name
+                                    </span>
+                                </td>
+                                <td>@expense.Description</td>
+                                <td class="text-end fw-bold text-danger">
+                                    Rs. @expense.Amount.ToString("N2")
+                                </td>
+                                <td>@expense.Remarks</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Edit" asp-route-id="@expense.Id" class="btn btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@expense.Id" class="btn btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-wallet display-4 d-block mb-2"></i>
+                                    No expense records found. <a asp-action="Create">Add your first expense</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetCategoryBadge(string categoryName)
+    {
+        return categoryName switch
+        {
+            "Fodder" => "bg-success",
+            "Medicine" => "bg-danger",
+            "Staff Salary" => "bg-primary",
+            "Electricity" => "bg-warning",
+            "Water" => "bg-info",
+            "Maintenance" => "bg-secondary",
+            "Transport" => "bg-dark",
+            _ => "bg-light text-dark"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#expensesTable').DataTable({
+                pageLength: 25,
+                responsive: true,
+                order: [[0, 'desc']],
+                language: {
+                    search: "Search expenses:",
+                    lengthMenu: "Show _MENU_ records per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered from _MAX_ total records)"
+                },
+                columnDefs: [
+                    { orderable: false, targets: [5] } // Disable sorting on Actions column
+                ]
+            });
+        });
+    </script>
+}

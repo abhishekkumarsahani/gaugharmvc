@@ -27,8 +27,6 @@ namespace GauGhar.Models
 
         [StringLength(500)]
         public string? Remarks { get; set; }
-
-        [Required]
         public string UserId { get; set; } = string.Empty;
 
         // Navigation properties

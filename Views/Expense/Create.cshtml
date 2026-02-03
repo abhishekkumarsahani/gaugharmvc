@@ -1,0 +1,152 @@
+﻿@model GauGhar.Models.Expense
+@{
+    ViewData["Title"] = "Add Expense";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title">
+                    <i class="bi bi-plus-circle me-2"></i>Add Expense
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ExpenseCategoryId" class="form-label"></label>
+                                <select asp-for="ExpenseCategoryId" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    @foreach (var category in ViewBag.Categories)
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="ExpenseCategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ExpenseDate" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input asp-for="ExpenseDate" type="date" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="ExpenseDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <input asp-for="Description" class="form-control"
+                                           placeholder="Enter expense description" required />
+                                </div>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                                <small class="text-muted">e.g., Fodder purchase, Medicine, Salary payment, etc.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Amount" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                                    <input asp-for="Amount" class="form-control"
+                                           placeholder="Enter amount"
+                                           step="0.01" min="0.01" max="1000000" required />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                                <small class="text-muted">Enter amount in Rs. (0.01 - 1,000,000)</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="2"
+                                          placeholder="Any additional remarks"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Card -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-eye me-2"></i>Expense Preview
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <h6>Category</h6>
+                                    <h5 id="categoryPreview" class="text-primary">-</h5>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <h6>Date</h6>
+                                    <h5 id="datePreview">-</h5>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <h6>Amount</h6>
+                                    <h5 id="amountPreview" class="text-danger">Rs. 0.00</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-check-circle me-2"></i>Add Expense
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Update preview
+        function updatePreview() {
+            var categorySelect = document.getElementById('ExpenseCategoryId');
+            var categoryText = categorySelect.options[categorySelect.selectedIndex].text;
+            var date = document.getElementById('ExpenseDate').value;
+            var amount = parseFloat(document.getElementById('Amount').value) || 0;
+            var description = document.getElementById('Description').value;
+
+            document.getElementById('categoryPreview').textContent = categoryText || '-';
+            document.getElementById('datePreview').textContent = date ? new Date(date).toLocaleDateString() : '-';
+            document.getElementById('amountPreview').textContent = 'Rs. ' + amount.toFixed(2);
+        }
+
+        // Update preview on input change
+        $('#ExpenseCategoryId, #ExpenseDate, #Amount, #Description').on('input change', updatePreview);
+
+        // Initialize preview on page load
+        $(document).ready(function () {
+            // Set default date to today
+            var today = new Date().toISOString().split('T')[0];
+            $('#ExpenseDate').val(today);
+
+            updatePreview();
+        });
+    </script>
+}
