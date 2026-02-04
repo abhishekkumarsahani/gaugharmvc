@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using GauGhar.Models;
-using GauGhar.Models; // Add this using directive
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GauGhar;
@@ -151,5 +150,78 @@ namespace GauGhar.Controllers
             }
         }
         #endregion
+
+        // GET: /Account/Manage
+        [HttpGet]
+        public async Task<IActionResult> Manage()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var model = new ManageViewModel
+            {
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address
+            };
+
+            return View(model);
+        }
+
+        // POST: /Account/Manage
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Manage(ManageViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Update user information
+                user.FullName = model.FullName;
+                user.PhoneNumber = model.PhoneNumber;
+                user.Address = model.Address;
+
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    foreach (var error in updateResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View(model);
+                }
+
+                // Change password if provided
+                if (!string.IsNullOrEmpty(model.OldPassword) && !string.IsNullOrEmpty(model.NewPassword))
+                {
+                    var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (!changePasswordResult.Succeeded)
+                    {
+                        foreach (var error in changePasswordResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
+                    }
+
+                    // Re-sign in the user to update security stamp
+                    await _signInManager.RefreshSignInAsync(user);
+                    TempData["SuccessMessage"] = "Password changed successfully!";
+                }
+
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("Manage");
+            }
+
+            return View(model);
+        }
     }
 }
