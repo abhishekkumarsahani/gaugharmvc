@@ -3,100 +3,142 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-lg mt-5">
-            <div class="card-header bg-success text-white">
-                <h3 class="card-title text-center">
-                    <i class="bi bi-person-plus me-2"></i>Create New Account
-                </h3>
-            </div>
-            <div class="card-body">
-                <form asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<style>
+    .auth-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #16a34a, #065f46);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="FullName" class="form-label"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                    <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
-                                </div>
-                                <span asp-validation-for="FullName" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="Email" class="form-label"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
-                                </div>
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
+    .auth-card {
+        width: 100%;
+        max-width: 820px;
+        border: none;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,.2);
+        background: #fff;
+    }
+
+    .auth-header {
+        padding: 2rem 2rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+        .auth-header h3 {
+            font-weight: 700;
+            margin-bottom: .25rem;
+        }
+
+        .auth-header p {
+            color: #6b7280;
+            font-size: .9rem;
+        }
+
+    .auth-body {
+        padding: 2rem;
+    }
+
+    .form-floating > .form-control {
+        border-radius: .75rem;
+    }
+
+    .btn-auth {
+        border-radius: .75rem;
+        padding: .75rem;
+        font-weight: 600;
+    }
+
+    .toggle-password {
+        cursor: pointer;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <h3>Create your account ✨</h3>
+            <p>Join <strong>GauGhar</strong> and get started today</p>
+        </div>
+
+        <div class="auth-body">
+            <form asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6 form-floating">
+                        <input asp-for="FullName" class="form-control" placeholder="Full Name" />
+                        <label asp-for="FullName"><i class="bi bi-person me-1"></i>Full Name</label>
+                        <span asp-validation-for="FullName" class="text-danger"></span>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="Password" class="form-label"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input asp-for="Password" class="form-control" placeholder="Enter password" />
-                                </div>
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="ConfirmPassword" class="form-label"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm password" />
-                                </div>
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                        </div>
+                    <div class="col-md-6 form-floating">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <label asp-for="Email"><i class="bi bi-envelope me-1"></i>Email</label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="PhoneNumber" class="form-label"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-phone"></i></span>
-                                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
-                                </div>
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="Address" class="form-label"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                    <input asp-for="Address" class="form-control" placeholder="Enter your address" />
-                                </div>
-                                <span asp-validation-for="Address" class="text-danger"></span>
-                            </div>
-                        </div>
+                    <div class="col-md-6 form-floating position-relative">
+                        <input asp-for="Password" class="form-control" placeholder="Password" id="password" />
+                        <label asp-for="Password"><i class="bi bi-lock me-1"></i>Password</label>
+                        <span class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-password" onclick="togglePwd('password','eye1')">
+                            <i class="bi bi-eye" id="eye1"></i>
+                        </span>
+                        <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-person-plus me-2"></i>Register
-                        </button>
-                        <a asp-action="Login" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-2"></i>Back to Login
-                        </a>
+                    <div class="col-md-6 form-floating position-relative">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" id="confirmPassword" />
+                        <label asp-for="ConfirmPassword"><i class="bi bi-lock-fill me-1"></i>Confirm Password</label>
+                        <span class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-password" onclick="togglePwd('confirmPassword','eye2')">
+                            <i class="bi bi-eye" id="eye2"></i>
+                        </span>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
-                </form>
-            </div>
+
+                    <div class="col-md-6 form-floating">
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone" />
+                        <label asp-for="PhoneNumber"><i class="bi bi-phone me-1"></i>Phone Number</label>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 form-floating">
+                        <input asp-for="Address" class="form-control" placeholder="Address" />
+                        <label asp-for="Address"><i class="bi bi-geo-alt me-1"></i>Address</label>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-success btn-auth">
+                        <i class="bi bi-person-plus me-1"></i> Create Account
+                    </button>
+                    <a asp-action="Login" class="btn btn-outline-secondary btn-auth">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Login
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    function togglePwd(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
