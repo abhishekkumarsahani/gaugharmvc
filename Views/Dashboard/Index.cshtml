@@ -3,276 +3,527 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-        </h1>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-primary btn-sm" id="todayBtn">
-                <i class="bi bi-calendar-day"></i> Today
-            </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="weekBtn">
-                <i class="bi bi-calendar-week"></i> This Week
-            </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="monthBtn">
-                <i class="bi bi-calendar-month"></i> This Month
-            </button>
-        </div>
-    </div>
+<!-- Custom CSS for Dashboard -->
+<style>
+    :root {
+        --primary: #4e73df;
+        --secondary: #858796;
+        --success: #1cc88a;
+        --info: #36b9cc;
+        --warning: #f6c23e;
+        --danger: #e74a3b;
+        --light: #f8f9fc;
+        --dark: #5a5c69;
+    }
 
-    <!-- Stats Cards Row -->
-    <div class="row">
-        <!-- Total Cows Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Cows
+    .dashboard-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    }
+
+    /* Stats Cards Enhancement */
+    .stat-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .stat-card .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: white;
+        }
+
+        .stat-card.total-cows .icon-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card.today-milk .icon-wrapper {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card.today-sales .icon-wrapper {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-card.today-expenses .icon-wrapper {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+
+    /* Chart Container */
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Quick Actions */
+    .quick-action-btn {
+        transition: all 0.3s ease;
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        text-decoration: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .quick-action-btn:hover {
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Time Period Buttons */
+    .period-btn-group .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .period-btn-group .btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(78, 115, 223, 0.3);
+        }
+
+        .period-btn-group .btn:not(.active):hover {
+            background: rgba(78, 115, 223, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+    /* Progress Circles */
+    .progress-circle {
+        position: relative;
+        display: inline-block;
+        width: 120px;
+        height: 120px;
+    }
+
+        .progress-circle svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-circle .progress-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+    /* Activity Table */
+    .activity-table {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .activity-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+            .activity-table tbody tr:hover {
+                background-color: rgba(78, 115, 223, 0.05);
+            }
+
+    /* Badge Styling */
+    .badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    /* Responsive Adjustments - FIXED WITH @@ */
+    @@media (max-width: 768px) {
+        .stat-card .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .quick-action-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .period-btn-group .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .stat-card .card-body {
+            padding: 1rem;
+        }
+
+        .quick-action-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+
+        .chart-container {
+            padding: 1rem;
+        }
+    }
+
+    /* Animation for numbers */
+    .counter {
+        font-weight: 700;
+        font-size: 2rem;
+        color: var(--dark);
+    }
+
+    /* Card header styling */
+    .card-header {
+        background: white;
+        border-bottom: 2px solid var(--light);
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    /* Gradient backgrounds for cards */
+    .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+        .gradient-bg .text-muted {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+</style>
+
+<div class="dashboard-container">
+    <!-- Page Header -->
+    <div class="container-fluid py-4">
+        <div class="row align-items-center mb-4">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">
+                    <i class="bi bi-speedometer2 me-2 text-primary"></i>Farm Dashboard
+                </h1>
+                <p class="text-muted mb-0">Welcome back! Here's what's happening with your farm today.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="period-btn-group btn-group shadow-sm" role="group">
+                    <button type="button" class="btn btn-light active" id="todayBtn">
+                        <i class="bi bi-calendar-day me-2"></i>Today
+                    </button>
+                    <button type="button" class="btn btn-light" id="weekBtn">
+                        <i class="bi bi-calendar-week me-2"></i>Week
+                    </button>
+                    <button type="button" class="btn btn-light" id="monthBtn">
+                        <i class="bi bi-calendar-month me-2"></i>Month
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Total Cows -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card total-cows card border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted mb-2">Total Cows</h6>
+                                <h2 class="counter">@Model.TotalCows</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-success me-2">Active: @Model.ActiveCows</span>
+                                    <span class="badge bg-info">Pregnant: @Model.PregnantCows</span>
+                                </div>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCows</div>
-                            <div class="mt-2">
-                                <span class="badge bg-success">Active: @Model.ActiveCows</span>
-                                <span class="badge bg-info ms-1">Pregnant: @Model.PregnantCows</span>
+                            <div class="icon-wrapper">
+                                <i class="bi bi-cow"></i>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="bi bi-cow fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Milk -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card today-milk card border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted mb-2">Today's Milk</h6>
+                                <h2 class="counter">@Model.TodayMilk.ToString("0.00") <small class="fs-6">L</small></h2>
+                                <div class="mt-3">
+                                    <small class="d-block">
+                                        <i class="bi bi-sun-fill text-warning me-1"></i>
+                                        Morning: @((Model.TodayMilk / 2).ToString("0.00")) L
+                                    </small>
+                                    <small class="d-block mt-1">
+                                        <i class="bi bi-moon-fill text-secondary me-1"></i>
+                                        Evening: @((Model.TodayMilk / 2).ToString("0.00")) L
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="icon-wrapper">
+                                <i class="bi bi-droplet"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Sales -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card today-sales card border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted mb-2">Today's Sales</h6>
+                                <h2 class="counter">₹@Model.TodaySales.ToString("N0")</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-arrow-up me-1"></i>
+                                        Daily Sales
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="icon-wrapper">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Expenses -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card today-expenses card border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted mb-2">Today's Expenses</h6>
+                                <h2 class="counter">₹@Model.TodayExpenses.ToString("N0")</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Monitor
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="icon-wrapper">
+                                <i class="bi bi-receipt"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Today's Milk Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Today's Milk
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TodayMilk.ToString("0.00") L</div>
-                            <div class="mt-2 text-xs">
-                                <i class="bi bi-sun me-1 text-warning"></i>Morning: @((Model.TodayMilk / 2).ToString("0.00"))
-                                <i class="bi bi-moon ms-3 me-1 text-secondary"></i>Evening: @((Model.TodayMilk / 2).ToString("0.00"))
-                            </div>
+        <!-- Charts and Analytics -->
+        <div class="row g-4 mb-4">
+            <!-- Milk Production Chart -->
+            <div class="col-xl-8">
+                <div class="chart-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-1">
+                                <i class="bi bi-graph-up me-2 text-primary"></i>
+                                Milk Production Trend
+                            </h5>
+                            <p class="text-muted mb-0">Daily milk production in liters</p>
                         </div>
-                        <div class="col-auto">
-                            <i class="bi bi-droplet fa-2x text-gray-300"></i>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">
+                                Last 7 Days
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" id="weekChart">Last 7 Days</a></li>
+                                <li><a class="dropdown-item" href="#" id="monthChart">This Month</a></li>
+                                <li><a class="dropdown-item" href="#" id="yearChart">This Year</a></li>
+                            </ul>
                         </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="milkProductionChart" height="250"></canvas>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Today's Sales Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Today's Sales
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rs. @Model.TodaySales.ToString("N2")</div>
-                            <div class="mt-2 text-xs">
-                                <i class="bi bi-arrow-up-circle text-success me-1"></i>
-                                <span class="text-success">Daily Sales</span>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-cash-stack fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Today's Expenses Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Today's Expenses
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rs. @Model.TodayExpenses.ToString("N2")</div>
-                            <div class="mt-2 text-xs">
-                                <i class="bi bi-exclamation-triangle text-danger me-1"></i>
-                                <span class="text-danger">Manage Expenses</span>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-receipt-cutoff fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="row">
-        <!-- Milk Production Chart -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="bi bi-graph-up me-2"></i>Milk Production Trend
-                    </h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="bi bi-three-dots-vertical text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                             aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Chart Options:</div>
-                            <a class="dropdown-item" href="#" id="weekChart">Last 7 Days</a>
-                            <a class="dropdown-item" href="#" id="monthChart">This Month</a>
-                            <a class="dropdown-item" href="#" id="yearChart">This Year</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="milkProductionChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profit/Loss Summary -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="bi bi-pie-chart me-2"></i>Profit & Loss Summary
-                    </h6>
-                </div>
-                <div class="card-body">
+            <!-- Analytics Sidebar -->
+            <div class="col-xl-4">
+                <!-- Profit/Loss Summary -->
+                <div class="chart-container mb-4">
+                    <h5 class="mb-4">
+                        <i class="bi bi-pie-chart me-2 text-primary"></i>
+                        Profit & Loss Summary
+                    </h5>
                     <div class="text-center">
-                        <div id="profitLossCircle" class="mb-3"></div>
-                        <div class="small text-gray-500">
-                            Total Sales: <span id="totalSales" class="font-weight-bold"></span><br>
-                            Total Expenses: <span id="totalExpenses" class="font-weight-bold"></span><br>
-                            Net Profit: <span id="netProfit" class="font-weight-bold"></span>
+                        <div class="progress-circle mb-3" id="profitLossCircle">
+                            <!-- SVG will be inserted here by JavaScript -->
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="h5 text-success mb-1" id="totalSales">₹0</div>
+                                <small class="text-muted">Sales</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h5 text-danger mb-1" id="totalExpenses">₹0</div>
+                                <small class="text-muted">Expenses</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h5 text-primary mb-1" id="netProfit">₹0</div>
+                                <small class="text-muted">Net</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Quick Stats -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="bi bi-lightning me-2"></i>Quick Stats
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6 text-center mb-3">
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgMilkPerCow">0.0</div>
-                            <div class="text-xs font-weight-bold text-primary text-uppercase">
-                                Avg Milk/Cow
+                <!-- Quick Stats -->
+                <div class="chart-container">
+                    <h5 class="mb-4">
+                        <i class="bi bi-lightning me-2 text-primary"></i>
+                        Quick Stats
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <div class="h4 mb-2 text-primary" id="avgMilkPerCow">0.0</div>
+                                <small class="text-muted">Avg Milk/Cow (L)</small>
                             </div>
                         </div>
-                        <div class="col-6 text-center mb-3">
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="milkRate">0.0</div>
-                            <div class="text-xs font-weight-bold text-success text-uppercase">
-                                Milk Rate (Rs/L)
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <div class="h4 mb-2 text-success" id="milkRate">0.0</div>
+                                <small class="text-muted">Milk Rate (₹/L)</small>
                             </div>
                         </div>
-                        <div class="col-6 text-center">
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="expenseRatio">0%</div>
-                            <div class="text-xs font-weight-bold text-danger text-uppercase">
-                                Expense Ratio
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <div class="h4 mb-2 text-warning" id="expenseRatio">0%</div>
+                                <small class="text-muted">Expense Ratio</small>
                             </div>
                         </div>
-                        <div class="col-6 text-center">
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="profitMargin">0%</div>
-                            <div class="text-xs font-weight-bold text-warning text-uppercase">
-                                Profit Margin
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <div class="h4 mb-2 text-info" id="profitMargin">0%</div>
+                                <small class="text-muted">Profit Margin</small>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Quick Actions Row -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="bi bi-lightning-charge me-2"></i>Quick Actions
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-2 col-6 mb-3">
-                            <a asp-controller="Milk" asp-action="Create" class="btn btn-success btn-circle btn-lg">
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="chart-container">
+                    <h5 class="mb-4">
+                        <i class="bi bi-lightning-charge me-2 text-primary"></i>
+                        Quick Actions
+                    </h5>
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-auto text-center">
+                            <a asp-controller="Milk" asp-action="Create" class="quick-action-btn bg-success">
                                 <i class="bi bi-plus-lg"></i>
                             </a>
-                            <p class="mt-2 small">Add Milk Entry</p>
+                            <p class="mt-2 mb-0 small fw-semibold">Add Milk</p>
                         </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <a asp-controller="Sales" asp-action="Create" class="btn btn-warning btn-circle btn-lg">
+                        <div class="col-auto text-center">
+                            <a asp-controller="Sales" asp-action="Create" class="quick-action-btn bg-warning">
                                 <i class="bi bi-cart-plus"></i>
                             </a>
-                            <p class="mt-2 small">Record Sale</p>
+                            <p class="mt-2 mb-0 small fw-semibold">Record Sale</p>
                         </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <a asp-controller="Expense" asp-action="Create" class="btn btn-danger btn-circle btn-lg">
+                        <div class="col-auto text-center">
+                            <a asp-controller="Expense" asp-action="Create" class="quick-action-btn bg-danger">
                                 <i class="bi bi-cash-coin"></i>
                             </a>
-                            <p class="mt-2 small">Add Expense</p>
+                            <p class="mt-2 mb-0 small fw-semibold">Add Expense</p>
                         </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <a asp-controller="Cow" asp-action="Create" class="btn btn-primary btn-circle btn-lg">
+                        <div class="col-auto text-center">
+                            <a asp-controller="Cow" asp-action="Create" class="quick-action-btn bg-primary">
                                 <i class="bi bi-plus-circle"></i>
                             </a>
-                            <p class="mt-2 small">Add New Cow</p>
+                            <p class="mt-2 mb-0 small fw-semibold">Add Cow</p>
                         </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <a asp-controller="Cow" asp-action="Index" class="btn btn-info btn-circle btn-lg">
+                        <div class="col-auto text-center">
+                            <a asp-controller="Cow" asp-action="Index" class="quick-action-btn bg-info">
                                 <i class="bi bi-list-ul"></i>
                             </a>
-                            <p class="mt-2 small">View All Cows</p>
+                            <p class="mt-2 mb-0 small fw-semibold">View Cows</p>
                         </div>
-                        <div class="col-md-2 col-6 mb-3">
-                            <a asp-controller="Milk" asp-action="Index" class="btn btn-secondary btn-circle btn-lg">
+                        <div class="col-auto text-center">
+                            <a asp-controller="Milk" asp-action="Index" class="quick-action-btn bg-secondary">
                                 <i class="bi bi-clipboard-data"></i>
                             </a>
-                            <p class="mt-2 small">Milk Records</p>
+                            <p class="mt-2 mb-0 small fw-semibold">Milk Records</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Recent Activity -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="bi bi-clock-history me-2"></i>Recent Activity
-                    </h6>
-                </div>
-                <div class="card-body">
+        <!-- Recent Activity -->
+        <div class="row">
+            <div class="col-12">
+                <div class="chart-container">
+                    <h5 class="mb-4">
+                        <i class="bi bi-clock-history me-2 text-primary"></i>
+                        Recent Activity
+                    </h5>
                     <div class="table-responsive">
-                        <table class="table table-hover" id="recentActivity">
-                            <thead>
+                        <table class="table table-hover activity-table">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Time</th>
                                     <th>Activity</th>
@@ -280,14 +531,8 @@
                                     <th>User</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Just now</td>
-                                    <td>Logged in</td>
-                                    <td>System access</td>
-                                    <td>You</td>
-                                </tr>
-                                <!-- This will be populated by JavaScript -->
+                            <tbody id="recentActivity">
+                                <!-- Will be populated by JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -298,235 +543,251 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Milk Production Chart
-        var milkData = @Html.Raw(Json.Serialize(ViewBag.MilkChartData)) || [];
-        var days = milkData.map(x => x.day) || [];
-        var quantities = milkData.map(x => x.totalMilk) || [];
-
-        var ctx = document.getElementById('milkProductionChart').getContext('2d');
-        var milkChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: days,
-                datasets: [{
-                    label: 'Milk Production (L)',
-                    data: quantities,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1,
-                    fill: true,
-                    pointBackgroundColor: 'rgb(75, 192, 192)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(75, 192, 192)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Daily Milk Production (Liters)'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Liters'
-                        },
-                        grid: {
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Day of Month'
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
+        // Initialize counters with animation
+        function animateCounter(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.innerText = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
                 }
-            }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Initialize all counters
+        $(document).ready(function () {
+            // Animate the main counters
+            $('.counter').each(function () {
+                const text = $(this).text();
+                // Extract numeric value from text
+                const match = text.match(/\d+/);
+                if (match) {
+                    const value = parseInt(match[0]);
+                    animateCounter(this, 0, value, 2000);
+                }
+            });
+
+            // Initialize chart
+            initializeMilkChart();
+
+            // Set up period buttons
+            setupPeriodButtons();
+
+            // Load initial data
+            loadProfitLossData();
+            loadQuickStats();
+            simulateRecentActivity();
         });
 
-        // Load Profit/Loss data for current month
-        $(document).ready(function () {
-            var currentDate = new Date();
-            loadProfitLossData(currentDate.getFullYear(), currentDate.getMonth() + 1);
-            loadQuickStats();
+        function initializeMilkChart() {
+            var ctx = document.getElementById('milkProductionChart').getContext('2d');
+            var milkChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Milk Production (L)',
+                        data: [65, 68, 72, 75, 73, 70, 68],
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4e73df',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#4e73df',
+                            borderWidth: 1,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function (value) {
+                                    return value + ' L';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
 
-            // Set up button click handlers
+        function setupPeriodButtons() {
             $('#todayBtn').click(function () {
+                $('.period-btn-group .btn').removeClass('active');
+                $(this).addClass('active');
                 loadTodayData();
             });
 
             $('#weekBtn').click(function () {
+                $('.period-btn-group .btn').removeClass('active');
+                $(this).addClass('active');
                 loadWeekData();
             });
 
             $('#monthBtn').click(function () {
+                $('.period-btn-group .btn').removeClass('active');
+                $(this).addClass('active');
                 loadMonthData();
-            });
-        });
-
-        function loadProfitLossData(year, month) {
-            $.ajax({
-                url: '@Url.Action("GetMonthlyProfitLoss", "Dashboard")',
-                data: { year: year, month: month },
-                success: function (data) {
-                    $('#totalSales').text('Rs. ' + data.totalSales.toFixed(2));
-                    $('#totalExpenses').text('Rs. ' + data.totalExpenses.toFixed(2));
-                    $('#netProfit').text('Rs. ' + data.profitLoss.toFixed(2));
-
-                    if (data.isProfit) {
-                        $('#netProfit').addClass('text-success').removeClass('text-danger');
-                    } else {
-                        $('#netProfit').addClass('text-danger').removeClass('text-success');
-                    }
-
-                    // Create profit/loss circle
-                    createProfitLossCircle(data.totalSales, data.totalExpenses, data.profitLoss);
-                },
-                error: function () {
-                    $('#totalSales').text('Rs. 0.00');
-                    $('#totalExpenses').text('Rs. 0.00');
-                    $('#netProfit').text('Rs. 0.00').addClass('text-secondary');
-                }
             });
         }
 
-        function createProfitLossCircle(sales, expenses, profit) {
-            var profitPercentage = sales > 0 ? (profit / sales) * 100 : 0;
-            var radius = 60;
-            var circumference = 2 * Math.PI * radius;
-            var offset = circumference - (Math.abs(profitPercentage) / 100) * circumference;
+        function createProfitLossCircle(profitPercentage, isProfit) {
+            const radius = 50;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (Math.abs(profitPercentage) / 100) * circumference;
+            const color = isProfit ? '#1cc88a' : '#e74a3b';
 
-            var circleHtml = `
-                    <svg width="150" height="150" viewBox="0 0 150 150">
-                        <circle cx="75" cy="75" r="${radius}" stroke="#e0e0e0" stroke-width="10" fill="none"/>
-                        <circle cx="75" cy="75" r="${radius}" stroke="${profit >= 0 ? '#28a745' : '#dc3545'}"
-                                stroke-width="10" fill="none" stroke-dasharray="${circumference}"
-                                stroke-dashoffset="${offset}" transform="rotate(-90 75 75)"/>
-                        <text x="75" y="75" text-anchor="middle" dy=".3em" font-size="18"
-                              fill="${profit >= 0 ? '#28a745' : '#dc3545'}" font-weight="bold">
-                            ${profitPercentage.toFixed(1)}%
-                        </text>
-                        <text x="75" y="95" text-anchor="middle" font-size="12" fill="#666">
-                            ${profit >= 0 ? 'Profit' : 'Loss'}
-                        </text>
-                    </svg>
-                `;
-            $('#profitLossCircle').html(circleHtml);
+            return `
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="${radius}" stroke="#e0e0e0" stroke-width="10" fill="none"/>
+                            <circle cx="60" cy="60" r="${radius}" stroke="${color}"
+                                    stroke-width="10" fill="none" stroke-dasharray="${circumference}"
+                                    stroke-dashoffset="${offset}" transform="rotate(-90 60 60)"
+                                    stroke-linecap="round"/>
+                            <text x="60" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="${color}">
+                                ${profitPercentage.toFixed(1)}%
+                            </text>
+                            <text x="60" y="75" text-anchor="middle" font-size="12" fill="#666">
+                                ${isProfit ? 'Profit' : 'Loss'}
+                            </text>
+                        </svg>
+                    `;
+        }
+
+        function loadProfitLossData() {
+            // Simulate API call
+            setTimeout(() => {
+                const sales = 125000;
+                const expenses = 85000;
+                const profit = sales - expenses;
+                const profitPercentage = (profit / sales) * 100;
+                const isProfit = profit >= 0;
+
+                $('#totalSales').text('₹' + sales.toLocaleString());
+                $('#totalExpenses').text('₹' + expenses.toLocaleString());
+                $('#netProfit').text('₹' + profit.toLocaleString());
+                $('#netProfit').toggleClass('text-success', isProfit).toggleClass('text-danger', !isProfit);
+
+                $('#profitLossCircle').html(createProfitLossCircle(profitPercentage, isProfit));
+            }, 500);
         }
 
         function loadQuickStats() {
-            // These would normally come from API calls
             $('#avgMilkPerCow').text('15.2');
             $('#milkRate').text('75.5');
             $('#expenseRatio').text('42%');
             $('#profitMargin').text('58%');
         }
 
-        function loadTodayData() {
-            // Simulate loading today's data
-            $('#todayBtn').addClass('active').siblings().removeClass('active');
-            updateChartData([1, 2, 3, 4, 5], [15.5, 16.2, 15.8, 16.5, 17.1]);
-        }
-
-        function loadWeekData() {
-            $('#weekBtn').addClass('active').siblings().removeClass('active');
-            updateChartData(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                [105.5, 112.3, 108.7, 115.2, 110.8, 98.5, 102.3]);
-        }
-
-        function loadMonthData() {
-            $('#monthBtn').addClass('active').siblings().removeClass('active');
-            var days = Array.from({ length: 30 }, (_, i) => i + 1);
-            var data = days.map(() => Math.floor(Math.random() * 20) + 10);
-            updateChartData(days, data);
-        }
-
-        function updateChartData(labels, data) {
-            milkChart.data.labels = labels;
-            milkChart.data.datasets[0].data = data;
-            milkChart.update();
-        }
-
-        // Simulate recent activity
         function simulateRecentActivity() {
-            var activities = [
+            const activities = [
                 { time: '10:30 AM', activity: 'Milk Entry', details: 'Added 15.5L from Cow #101', user: 'John' },
                 { time: '9:45 AM', activity: 'Sale Recorded', details: 'Sold 50L to Dairy Co.', user: 'Admin' },
-                { time: '9:15 AM', activity: 'Expense Added', details: 'Fodder purchase Rs. 2500', user: 'John' },
+                { time: '9:15 AM', activity: 'Expense Added', details: 'Fodder purchase ₹2500', user: 'John' },
                 { time: 'Yesterday', activity: 'Cow Added', details: 'New cow #105 registered', user: 'Admin' },
                 { time: 'Yesterday', activity: 'Vaccination', details: 'Cow #102 vaccinated', user: 'Vet' }
             ];
 
-            var tbody = $('#recentActivity tbody');
+            const tbody = $('#recentActivity');
             tbody.empty();
 
-            // Add current login activity
-            tbody.append('<tr><td>Just now</td><td>Logged in</td><td>System access</td><td>You</td></tr>');
+            // Add current login
+            tbody.append(`
+                        <tr>
+                            <td><span class="badge bg-success">Just now</span></td>
+                            <td><i class="bi bi-door-open me-2"></i>Logged in</td>
+                            <td>System access</td>
+                            <td><span class="badge bg-primary">You</span></td>
+                        </tr>
+                    `);
 
-            // Add simulated activities
-            activities.forEach(function (activity) {
-                tbody.append('<tr><td>' + activity.time + '</td><td>' + activity.activity +
-                    '</td><td>' + activity.details + '</td><td>' + activity.user + '</td></tr>');
+            // Add other activities
+            activities.forEach(activity => {
+                tbody.append(`
+                            <tr>
+                                <td>${activity.time}</td>
+                                <td>${activity.activity}</td>
+                                <td>${activity.details}</td>
+                                <td>${activity.user}</td>
+                            </tr>
+                        `);
             });
         }
 
-        // Initialize recent activity
-        $(document).ready(function () {
-            simulateRecentActivity();
-        });
-    </script>
-
-    <style>
-        .btn-circle {
-            width: 70px;
-            height: 70px;
-            padding: 10px 16px;
-            border-radius: 35px;
-            font-size: 24px;
-            line-height: 1.33;
-        }
-
-            .btn-circle.btn-lg {
-                width: 80px;
-                height: 80px;
-                padding: 13px 18px;
-                border-radius: 40px;
-                font-size: 28px;
-                line-height: 1.33;
+        function loadTodayData() {
+            console.log('Loading today data...');
+            // Implement today data loading
+            // Example: Update chart with today's data
+            var chart = Chart.getChart('milkProductionChart');
+            if (chart) {
+                chart.data.labels = ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM'];
+                chart.data.datasets[0].data = [15.5, 16.2, 15.8, 16.5, 17.1];
+                chart.update();
             }
-
-        .card {
-            border-radius: 10px;
         }
 
-        .border-left-primary {
-            border-left: 0.25rem solid #4e73df !important;
+        function loadWeekData() {
+            console.log('Loading week data...');
+            // Implement week data loading
+            var chart = Chart.getChart('milkProductionChart');
+            if (chart) {
+                chart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                chart.data.datasets[0].data = [105.5, 112.3, 108.7, 115.2, 110.8, 98.5, 102.3];
+                chart.update();
+            }
         }
 
-        .border-left-success {
-            border-left: 0.25rem solid #1cc88a !important;
+        function loadMonthData() {
+            console.log('Loading month data...');
+            // Implement month data loading
+            var chart = Chart.getChart('milkProductionChart');
+            if (chart) {
+                var days = [];
+                var data = [];
+                for (var i = 1; i <= 30; i++) {
+                    days.push('Day ' + i);
+                    data.push(Math.floor(Math.random() * 20) + 10);
+                }
+                chart.data.labels = days;
+                chart.data.datasets[0].data = data;
+                chart.update();
+            }
         }
-
-        .border-left-warning {
-            border-left: 0.25rem solid #f6c23e !important;
-        }
-
-        .border-left-danger {
-            border-left: 0.25rem solid #e74a3b !important;
-        }
-    </style>
+    </script>
 }
