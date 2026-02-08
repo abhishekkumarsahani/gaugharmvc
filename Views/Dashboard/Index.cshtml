@@ -162,7 +162,7 @@
         font-weight: 600;
     }
 
-    /* Responsive Adjustments - FIXED WITH @@ */
+    /* Responsive Adjustments */
     @@media (max-width: 768px) {
         .stat-card .icon-wrapper {
             width: 50px;
@@ -278,8 +278,8 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase text-muted mb-2">Total Cows</h6>
-                                <h2 class="counter">@Model.TotalCows</h2>
+                                <h6 class="text-uppercase text-muted mb-2 period-label" data-today="Total Cows" data-week="Total Cows" data-month="Total Cows">Total Cows</h6>
+                                <h2 class="counter" id="totalCowsCounter">@Model.TotalCows</h2>
                                 <div class="mt-3">
                                     <span class="badge bg-success me-2">Active: @Model.ActiveCows</span>
                                     <span class="badge bg-info">Pregnant: @Model.PregnantCows</span>
@@ -299,14 +299,14 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase text-muted mb-2">Today's Milk</h6>
-                                <h2 class="counter">@Model.TodayMilk.ToString("0.00") <small class="fs-6">L</small></h2>
+                                <h6 class="text-uppercase text-muted mb-2 period-label" data-today="Today's Milk" data-week="Weekly Milk" data-month="Monthly Milk">Today's Milk</h6>
+                                <h2 class="counter" id="milkCounter">@Model.TodayMilk.ToString("0.00") <small class="fs-6">L</small></h2>
                                 <div class="mt-3">
-                                    <small class="d-block">
+                                    <small class="d-block" id="morningMilk">
                                         <i class="bi bi-sun-fill text-warning me-1"></i>
                                         Morning: @((Model.TodayMilk / 2).ToString("0.00")) L
                                     </small>
-                                    <small class="d-block mt-1">
+                                    <small class="d-block mt-1" id="eveningMilk">
                                         <i class="bi bi-moon-fill text-secondary me-1"></i>
                                         Evening: @((Model.TodayMilk / 2).ToString("0.00")) L
                                     </small>
@@ -326,8 +326,8 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase text-muted mb-2">Today's Sales</h6>
-                                <h2 class="counter">₹@Model.TodaySales.ToString("N0")</h2>
+                                <h6 class="text-uppercase text-muted mb-2 period-label" data-today="Today's Sales" data-week="Weekly Sales" data-month="Monthly Sales">Today's Sales</h6>
+                                <h2 class="counter" id="salesCounter">₹@Model.TodaySales.ToString("N0")</h2>
                                 <div class="mt-3">
                                     <span class="badge bg-success">
                                         <i class="bi bi-arrow-up me-1"></i>
@@ -349,8 +349,8 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase text-muted mb-2">Today's Expenses</h6>
-                                <h2 class="counter">₹@Model.TodayExpenses.ToString("N0")</h2>
+                                <h6 class="text-uppercase text-muted mb-2 period-label" data-today="Today's Expenses" data-week="Weekly Expenses" data-month="Monthly Expenses">Today's Expenses</h6>
+                                <h2 class="counter" id="expensesCounter">₹@Model.TodayExpenses.ToString("N0")</h2>
                                 <div class="mt-3">
                                     <span class="badge bg-danger">
                                         <i class="bi bi-exclamation-triangle me-1"></i>
@@ -376,19 +376,19 @@
                         <div>
                             <h5 class="mb-1">
                                 <i class="bi bi-graph-up me-2 text-primary"></i>
-                                Milk Production Trend
+                                <span id="chartTitle">Milk Production Trend</span>
                             </h5>
-                            <p class="text-muted mb-0">Daily milk production in liters</p>
+                            <p class="text-muted mb-0" id="chartSubtitle">Daily milk production in liters</p>
                         </div>
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
-                                    data-bs-toggle="dropdown">
+                                    data-bs-toggle="dropdown" id="chartPeriodBtn">
                                 Last 7 Days
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" id="weekChart">Last 7 Days</a></li>
-                                <li><a class="dropdown-item" href="#" id="monthChart">This Month</a></li>
-                                <li><a class="dropdown-item" href="#" id="yearChart">This Year</a></li>
+                                <li><a class="dropdown-item chart-period" href="#" data-period="week">Last 7 Days</a></li>
+                                <li><a class="dropdown-item chart-period" href="#" data-period="month">This Month</a></li>
+                                <li><a class="dropdown-item chart-period" href="#" data-period="year">This Year</a></li>
                             </ul>
                         </div>
                     </div>
@@ -404,7 +404,7 @@
                 <div class="chart-container mb-4">
                     <h5 class="mb-4">
                         <i class="bi bi-pie-chart me-2 text-primary"></i>
-                        Profit & Loss Summary
+                        <span id="profitLossTitle">Profit & Loss Summary</span>
                     </h5>
                     <div class="text-center">
                         <div class="progress-circle mb-3" id="profitLossCircle">
@@ -412,15 +412,15 @@
                         </div>
                         <div class="row text-center">
                             <div class="col-4">
-                                <div class="h5 text-success mb-1" id="totalSales">₹0</div>
+                                <div class="h5 text-success mb-1" id="totalSales">₹@Model.TodaySales.ToString("N0")</div>
                                 <small class="text-muted">Sales</small>
                             </div>
                             <div class="col-4">
-                                <div class="h5 text-danger mb-1" id="totalExpenses">₹0</div>
+                                <div class="h5 text-danger mb-1" id="totalExpenses">₹@Model.TodayExpenses.ToString("N0")</div>
                                 <small class="text-muted">Expenses</small>
                             </div>
                             <div class="col-4">
-                                <div class="h5 text-primary mb-1" id="netProfit">₹0</div>
+                                <div class="h5 text-primary mb-1" id="netProfit">₹@((Model.TodaySales - Model.TodayExpenses).ToString("N0"))</div>
                                 <small class="text-muted">Net</small>
                             </div>
                         </div>
@@ -436,25 +436,61 @@
                     <div class="row g-3">
                         <div class="col-6">
                             <div class="text-center p-3 bg-light rounded">
-                                <div class="h4 mb-2 text-primary" id="avgMilkPerCow">0.0</div>
+                                <div class="h4 mb-2 text-primary" id="avgMilkPerCow">
+                                    @if (Model.TotalCows > 0)
+                                    {
+                                        @((Model.TodayMilk / Model.TotalCows).ToString("0.0"))
+                                    }
+                                    else
+                                    {
+                                        <text>0.0</text>
+                                    }
+                                </div>
                                 <small class="text-muted">Avg Milk/Cow (L)</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-3 bg-light rounded">
-                                <div class="h4 mb-2 text-success" id="milkRate">0.0</div>
+                                <div class="h4 mb-2 text-success" id="milkRate">
+                                    @if (Model.TodayMilk > 0)
+                                    {
+                                        @((Model.TodaySales / Model.TodayMilk).ToString("0.0"))
+                                    }
+                                    else
+                                    {
+                                        <text>0.0</text>
+                                    }
+                                </div>
                                 <small class="text-muted">Milk Rate (₹/L)</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-3 bg-light rounded">
-                                <div class="h4 mb-2 text-warning" id="expenseRatio">0%</div>
+                                <div class="h4 mb-2 text-warning" id="expenseRatio">
+                                    @if (Model.TodaySales > 0)
+                                    {
+                                        @(((Model.TodayExpenses / Model.TodaySales) * 100).ToString("0") + "%")
+                                    }
+                                    else
+                                    {
+                                        <text>0%</text>
+                                    }
+                                </div>
                                 <small class="text-muted">Expense Ratio</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-3 bg-light rounded">
-                                <div class="h4 mb-2 text-info" id="profitMargin">0%</div>
+                                <div class="h4 mb-2 text-info" id="profitMargin">
+                                    @if (Model.TodaySales > 0)
+                                    {
+                                        @((((Model.TodaySales - Model.TodayExpenses) / Model.TodaySales) * 100).ToString("0") + "%")
+                                    }
+                                    else
+                                    {
+                                        <text>0%</text>
+                                    }
+                                </div>
                                 <small class="text-muted">Profit Margin</small>
                             </div>
                         </div>
@@ -545,32 +581,17 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Initialize counters with animation
-        function animateCounter(element, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                element.innerText = Math.floor(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
+        // Global variables
+        let currentPeriod = 'today';
+        let milkChart = null;
+        let isInitialized = false;
 
-        // Initialize all counters
-        $(document).ready(function () {
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM loaded, initializing dashboard...');
+
             // Animate the main counters
-            $('.counter').each(function () {
-                const text = $(this).text();
-                // Extract numeric value from text
-                const match = text.match(/\d+/);
-                if (match) {
-                    const value = parseInt(match[0]);
-                    animateCounter(this, 0, value, 2000);
-                }
-            });
+            animateAllCounters();
 
             // Initialize chart
             initializeMilkChart();
@@ -578,93 +599,278 @@
             // Set up period buttons
             setupPeriodButtons();
 
+            // Set up chart period buttons
+            setupChartPeriodButtons();
+
             // Load initial data
-            loadProfitLossData();
-            loadQuickStats();
+            loadProfitLossData('today');
             simulateRecentActivity();
+
+            isInitialized = true;
+            console.log('Dashboard initialized successfully');
         });
 
-        function initializeMilkChart() {
-            var ctx = document.getElementById('milkProductionChart').getContext('2d');
-            var milkChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Milk Production (L)',
-                        data: [65, 68, 72, 75, 73, 70, 68],
-                        borderColor: '#4e73df',
-                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#4e73df',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: '#4e73df',
-                            borderWidth: 1,
-                            cornerRadius: 8
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                drawBorder: false
-                            },
-                            ticks: {
-                                callback: function (value) {
-                                    return value + ' L';
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    }
+        function animateAllCounters() {
+            $('.counter').each(function () {
+                const text = $(this).text();
+                // Extract numeric value from text
+                const match = text.replace(/[^0-9.]/g, '');
+                if (match) {
+                    const value = parseFloat(match);
+                    animateCounter(this, 0, value, 1000);
                 }
             });
         }
 
+        function animateCounter(element, start, end, duration) {
+            const startTime = Date.now();
+            const updateCounter = () => {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                let currentValue;
+                if (progress < 1) {
+                    currentValue = Math.floor(start + (end - start) * progress);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    currentValue = end;
+                }
+
+                // Format the display
+                if (element.id === 'milkCounter') {
+                    element.innerHTML = currentValue.toFixed(2) + ' <small class="fs-6">L</small>';
+                } else if (element.id === 'salesCounter' || element.id === 'expensesCounter') {
+                    element.textContent = '₹' + currentValue.toLocaleString();
+                } else {
+                    element.textContent = currentValue;
+                }
+            };
+
+            requestAnimationFrame(updateCounter);
+        }
+
+        function initializeMilkChart() {
+            console.log('Initializing milk chart...');
+            try {
+                const ctx = document.getElementById('milkProductionChart').getContext('2d');
+                milkChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Milk Production (L)',
+                            data: [65, 68, 72, 75, 73, 70, 68],
+                            borderColor: '#4e73df',
+                            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#4e73df',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#4e73df',
+                                borderWidth: 1,
+                                cornerRadius: 8
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    callback: function (value) {
+                                        return value + ' L';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Milk chart initialized successfully');
+            } catch (error) {
+                console.error('Error initializing chart:', error);
+            }
+        }
+
         function setupPeriodButtons() {
-            $('#todayBtn').click(function () {
-                $('.period-btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                loadTodayData();
+            console.log('Setting up period buttons...');
+
+            // Remove any existing event listeners
+            $('#todayBtn').off('click');
+            $('#weekBtn').off('click');
+            $('#monthBtn').off('click');
+
+            // Add new event listeners
+            $('#todayBtn').on('click', function () {
+                console.log('Today button clicked');
+                setActivePeriodButton('today');
+                updateDashboardForPeriod('today');
             });
 
-            $('#weekBtn').click(function () {
-                $('.period-btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                loadWeekData();
+            $('#weekBtn').on('click', function () {
+                console.log('Week button clicked');
+                setActivePeriodButton('week');
+                updateDashboardForPeriod('week');
             });
 
-            $('#monthBtn').click(function () {
-                $('.period-btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                loadMonthData();
+            $('#monthBtn').on('click', function () {
+                console.log('Month button clicked');
+                setActivePeriodButton('month');
+                updateDashboardForPeriod('month');
             });
+
+            console.log('Period buttons set up successfully');
+        }
+
+        function setActivePeriodButton(period) {
+            $('.period-btn-group .btn').removeClass('active');
+            $(`#${period}Btn`).addClass('active');
+        }
+
+        function updateDashboardForPeriod(period) {
+            console.log('Updating dashboard for period:', period);
+
+            // Update labels
+            $('.period-label').each(function () {
+                const newText = $(this).data(period);
+                $(this).text(newText);
+            });
+
+            // Update counter values based on period
+            const milkData = getPeriodData(period);
+
+            // Animate counters to new values
+            animateCounter(document.getElementById('totalCowsCounter'), 0, milkData.totalCows, 800);
+            animateCounter(document.getElementById('milkCounter'), 0, milkData.milk, 800);
+            animateCounter(document.getElementById('salesCounter'), 0, milkData.sales, 800);
+            animateCounter(document.getElementById('expensesCounter'), 0, milkData.expenses, 800);
+
+            // Update milk breakdown
+            $('#morningMilk').html(
+                `<i class="bi bi-sun-fill text-warning me-1"></i>Morning: ${milkData.morningMilk} L`
+            );
+            $('#eveningMilk').html(
+                `<i class="bi bi-moon-fill text-secondary me-1"></i>Evening: ${milkData.eveningMilk} L`
+            );
+
+            // Update profit/loss data
+            updateProfitLossData(period);
+
+            // Update quick stats
+            updateQuickStats(period);
+
+            console.log('Dashboard updated for period:', period);
+        }
+
+        function getPeriodData(period) {
+            const baseMilk = @Model.TodayMilk;
+            const baseSales = @Model.TodaySales;
+            const baseExpenses = @Model.TodayExpenses;
+            const totalCows = @Model.TotalCows;
+
+            let data = {
+                totalCows: totalCows,
+                milk: baseMilk,
+                sales: baseSales,
+                expenses: baseExpenses,
+                morningMilk: (baseMilk / 2).toFixed(2),
+                eveningMilk: (baseMilk / 2).toFixed(2)
+            };
+
+            switch (period) {
+                case 'week':
+                    data.milk = baseMilk * 7;
+                    data.sales = baseSales * 7;
+                    data.expenses = baseExpenses * 7;
+                    data.morningMilk = ((baseMilk * 7) / 14).toFixed(2);
+                    data.eveningMilk = ((baseMilk * 7) / 14).toFixed(2);
+                    break;
+                case 'month':
+                    data.milk = baseMilk * 30;
+                    data.sales = baseSales * 30;
+                    data.expenses = baseExpenses * 30;
+                    data.morningMilk = ((baseMilk * 30) / 60).toFixed(2);
+                    data.eveningMilk = ((baseMilk * 30) / 60).toFixed(2);
+                    break;
+            }
+
+            return data;
+        }
+
+        function setupChartPeriodButtons() {
+            console.log('Setting up chart period buttons...');
+
+            $('.chart-period').off('click').on('click', function (e) {
+                e.preventDefault();
+                const period = $(this).data('period');
+                console.log('Chart period selected:', period);
+                updateChartData(period);
+                $('#chartPeriodBtn').text($(this).text());
+            });
+        }
+
+        function updateChartData(period) {
+            if (!milkChart) {
+                console.error('Chart not initialized');
+                return;
+            }
+
+            console.log('Updating chart data for period:', period);
+
+            let labels, data, title, subtitle;
+
+            switch (period) {
+                case 'month':
+                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    data = [450, 480, 520, 510];
+                    title = 'Monthly Milk Production';
+                    subtitle = 'Weekly milk production in liters';
+                    break;
+                case 'year':
+                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    data = [3200, 3350, 3450, 3550, 3650, 3750, 3850, 3950, 4050, 4150, 4250, 4350];
+                    title = 'Yearly Milk Production';
+                    subtitle = 'Monthly milk production in liters';
+                    break;
+                default: // week
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    data = [105.5, 112.3, 108.7, 115.2, 110.8, 98.5, 102.3];
+                    title = 'Weekly Milk Production';
+                    subtitle = 'Daily milk production in liters';
+                    break;
+            }
+
+            milkChart.data.labels = labels;
+            milkChart.data.datasets[0].data = data;
+            milkChart.update();
+
+            $('#chartTitle').text(title);
+            $('#chartSubtitle').text(subtitle);
+
+            console.log('Chart updated successfully');
         }
 
         function createProfitLossCircle(profitPercentage, isProfit) {
@@ -681,7 +887,7 @@
                                     stroke-dashoffset="${offset}" transform="rotate(-90 60 60)"
                                     stroke-linecap="round"/>
                             <text x="60" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="${color}">
-                                ${profitPercentage.toFixed(1)}%
+                                ${Math.abs(profitPercentage).toFixed(1)}%
                             </text>
                             <text x="60" y="75" text-anchor="middle" font-size="12" fill="#666">
                                 ${isProfit ? 'Profit' : 'Loss'}
@@ -690,38 +896,111 @@
                     `;
         }
 
-        function loadProfitLossData() {
-            // Simulate API call
-            setTimeout(() => {
-                const sales = 125000;
-                const expenses = 85000;
-                const profit = sales - expenses;
-                const profitPercentage = (profit / sales) * 100;
-                const isProfit = profit >= 0;
-
-                $('#totalSales').text('₹' + sales.toLocaleString());
-                $('#totalExpenses').text('₹' + expenses.toLocaleString());
-                $('#netProfit').text('₹' + profit.toLocaleString());
-                $('#netProfit').toggleClass('text-success', isProfit).toggleClass('text-danger', !isProfit);
-
-                $('#profitLossCircle').html(createProfitLossCircle(profitPercentage, isProfit));
-            }, 500);
+        function loadProfitLossData(period) {
+            console.log('Loading profit/loss data for period:', period);
+            updateProfitLossData(period);
         }
 
-        function loadQuickStats() {
-            $('#avgMilkPerCow').text('15.2');
-            $('#milkRate').text('75.5');
-            $('#expenseRatio').text('42%');
-            $('#profitMargin').text('58%');
+        function updateProfitLossData(period) {
+            console.log('Updating profit/loss for period:', period);
+
+            const baseSales = @Model.TodaySales;
+            const baseExpenses = @Model.TodayExpenses;
+
+            let sales, expenses;
+
+            switch (period) {
+                case 'week':
+                    sales = baseSales * 7;
+                    expenses = baseExpenses * 7;
+                    $('#profitLossTitle').text('Weekly Profit & Loss');
+                    break;
+                case 'month':
+                    sales = baseSales * 30;
+                    expenses = baseExpenses * 30;
+                    $('#profitLossTitle').text('Monthly Profit & Loss');
+                    break;
+                default:
+                    sales = baseSales;
+                    expenses = baseExpenses;
+                    $('#profitLossTitle').text('Daily Profit & Loss');
+                    break;
+            }
+
+            const profit = sales - expenses;
+            const profitPercentage = sales > 0 ? (profit / sales) * 100 : 0;
+            const isProfit = profit >= 0;
+
+            $('#totalSales').text('₹' + sales.toLocaleString());
+            $('#totalExpenses').text('₹' + expenses.toLocaleString());
+            $('#netProfit').text('₹' + profit.toLocaleString());
+
+            // Remove all color classes first
+            $('#netProfit').removeClass('text-success text-danger text-primary');
+
+            // Add appropriate color class
+            if (isProfit) {
+                $('#netProfit').addClass('text-success');
+            } else {
+                $('#netProfit').addClass('text-danger');
+            }
+
+            $('#profitLossCircle').html(createProfitLossCircle(profitPercentage, isProfit));
+            console.log('Profit/loss updated successfully');
+        }
+
+        function updateQuickStats(period) {
+            console.log('Updating quick stats for period:', period);
+
+            const baseMilk = @Model.TodayMilk;
+            const baseSales = @Model.TodaySales;
+            const baseExpenses = @Model.TodayExpenses;
+            const totalCows = @Model.TotalCows;
+
+            let milk, sales, expenses;
+
+            switch (period) {
+                case 'week':
+                    milk = baseMilk * 7;
+                    sales = baseSales * 7;
+                    expenses = baseExpenses * 7;
+                    break;
+                case 'month':
+                    milk = baseMilk * 30;
+                    sales = baseSales * 30;
+                    expenses = baseExpenses * 30;
+                    break;
+                default:
+                    milk = baseMilk;
+                    sales = baseSales;
+                    expenses = baseExpenses;
+                    break;
+            }
+
+            const avgMilkPerCow = totalCows > 0 ? (milk / totalCows).toFixed(1) : '0.0';
+            const milkRate = milk > 0 ? (sales / milk).toFixed(1) : '0.0';
+            const expenseRatio = sales > 0 ? ((expenses / sales) * 100).toFixed(0) : '0';
+            const profitMargin = sales > 0 ? (((sales - expenses) / sales) * 100).toFixed(0) : '0';
+
+            $('#avgMilkPerCow').text(avgMilkPerCow);
+            $('#milkRate').text(milkRate);
+            $('#expenseRatio').text(expenseRatio + '%');
+            $('#profitMargin').text(profitMargin + '%');
+
+            console.log('Quick stats updated successfully');
         }
 
         function simulateRecentActivity() {
+            console.log('Loading recent activity...');
+
             const activities = [
                 { time: '10:30 AM', activity: 'Milk Entry', details: 'Added 15.5L from Cow #101', user: 'John' },
                 { time: '9:45 AM', activity: 'Sale Recorded', details: 'Sold 50L to Dairy Co.', user: 'Admin' },
                 { time: '9:15 AM', activity: 'Expense Added', details: 'Fodder purchase ₹2500', user: 'John' },
                 { time: 'Yesterday', activity: 'Cow Added', details: 'New cow #105 registered', user: 'Admin' },
-                { time: 'Yesterday', activity: 'Vaccination', details: 'Cow #102 vaccinated', user: 'Vet' }
+                { time: 'Yesterday', activity: 'Vaccination', details: 'Cow #102 vaccinated', user: 'Vet' },
+                { time: '2 days ago', activity: 'Milk Entry', details: 'Added 16.2L from Cow #103', user: 'John' },
+                { time: '3 days ago', activity: 'Health Check', details: 'Routine check for Cow #104', user: 'Vet' }
             ];
 
             const tbody = $('#recentActivity');
@@ -748,46 +1027,17 @@
                             </tr>
                         `);
             });
+
+            console.log('Recent activity loaded successfully');
         }
 
-        function loadTodayData() {
-            console.log('Loading today data...');
-            // Implement today data loading
-            // Example: Update chart with today's data
-            var chart = Chart.getChart('milkProductionChart');
-            if (chart) {
-                chart.data.labels = ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM'];
-                chart.data.datasets[0].data = [15.5, 16.2, 15.8, 16.5, 17.1];
-                chart.update();
-            }
-        }
-
-        function loadWeekData() {
-            console.log('Loading week data...');
-            // Implement week data loading
-            var chart = Chart.getChart('milkProductionChart');
-            if (chart) {
-                chart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                chart.data.datasets[0].data = [105.5, 112.3, 108.7, 115.2, 110.8, 98.5, 102.3];
-                chart.update();
-            }
-        }
-
-        function loadMonthData() {
-            console.log('Loading month data...');
-            // Implement month data loading
-            var chart = Chart.getChart('milkProductionChart');
-            if (chart) {
-                var days = [];
-                var data = [];
-                for (var i = 1; i <= 30; i++) {
-                    days.push('Day ' + i);
-                    data.push(Math.floor(Math.random() * 20) + 10);
-                }
-                chart.data.labels = days;
-                chart.data.datasets[0].data = data;
-                chart.update();
-            }
-        }
+        // Make functions available globally for debugging
+        window.dashboard = {
+            updateDashboardForPeriod,
+            updateChartData,
+            updateProfitLossData,
+            updateQuickStats,
+            getPeriodData
+        };
     </script>
 }
